@@ -1,0 +1,54 @@
+{
+  "name": "E-Workforce Enterprise — Field Workforce Platform",
+  "short_name": "E-Workforce",
+  "description": "Enterprise GPS field employee tracking, geofenced attendance, proof of work, and AI route optimization platform.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#050b14",
+  "theme_color": "#050b14",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/logo-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Live GPS Tracking",
+      "short_name": "Live Map",
+      "description": "View live location of all moving field employees",
+      "url": "/?page=live",
+      "icons": [{ "src": "/logo-icon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Tasks Kanban Board",
+      "short_name": "Tasks",
+      "description": "Manage work orders and dispatch tasks",
+      "url": "/?page=tasks",
+      "icons": [{ "src": "/logo-icon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Attendance Verification",
+      "short_name": "Attendance",
+      "description": "Review geofence-verified check-ins",
+      "url": "/?page=attendance",
+      "icons": [{ "src": "/logo-icon.png", "sizes": "192x192" }]
+    }
+  ]
+}

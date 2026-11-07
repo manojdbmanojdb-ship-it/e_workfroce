@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ework_backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - SUPABASE_URL=https://ptxfxtxwytrzznswudlc.supabase.co
+      - SUPABASE_ANON_KEY=sb_publishable_G3ztWl6ullU0Zn0NJgJn9Q_AAKDtdFQ
+      - NODE_ENV=production
+    networks:
+      - ework_network
+
+  dashboard:
+    build:
+      context: ./admin_dashboard
+      dockerfile: Dockerfile
+    container_name: ework_dashboard
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - ework_network
+
+networks:
+  ework_network:
+    driver: bridge

@@ -1,0 +1,40 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.7.2'
+        classpath 'com.google.gms:google-services:4.4.2'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21'
+    }
+}
+
+apply from: "variables.gradle"
+
+def externalBuildDir = new File(System.getProperty("user.home"), ".android-builds/eworkforce")
+
+allprojects {
+    // Redirect build directories outside OneDrive to avoid Windows MAX_PATH (>260 chars) and OneDrive file-locking
+    def subprojectName = project.path.replace(':', '_')
+    if (subprojectName.isEmpty() || subprojectName == '_') subprojectName = '_root'
+    layout.buildDirectory.set(new File(externalBuildDir, subprojectName))
+
+    repositories {
+        google()
+        mavenCentral()
+    }
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions.jvmTarget = "21"
+    }
+    tasks.matching { it.name.startsWith("lintVital") }.configureEach {
+        enabled = false
+    }
+}
+
+task clean(type: Delete) {
+    delete externalBuildDir
+    delete rootProject.buildDir
+}

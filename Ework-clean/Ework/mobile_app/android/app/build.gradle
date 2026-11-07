@@ -1,0 +1,104 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace "com.eworkforce.app"
+    compileSdk rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.eworkforce.app"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        release {
+            def keystoreFile = file('../../release/release.keystore')
+            if (keystoreFile.exists()) {
+                storeFile keystoreFile
+                storePassword 'eworkforce2026'
+                keyAlias 'eworkforce'
+                keyPassword 'eworkforce2026'
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    // implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name == 'assembleDebug') {
+        task.doLast {
+            try {
+                def externalApk = new File(layout.buildDirectory.get().asFile, "outputs/apk/debug/app-debug.apk")
+                if (externalApk.exists()) {
+                    def localApkDir = file("build/outputs/apk/debug")
+                    localApkDir.mkdirs()
+                    copy {
+                        from externalApk
+                        into localApkDir
+                    }
+                    def webPublic = file("../../../admin_dashboard/public/downloads")
+                    def webDist = file("../../../admin_dashboard/dist/downloads")
+                    webPublic.mkdirs()
+                    webDist.mkdirs()
+                    copy {
+                        from externalApk
+                        into webPublic
+                        rename { 'eworkforce-mobile.apk' }
+                    }
+                    copy {
+                        from externalApk
+                        into webDist
+                        rename { 'eworkforce-mobile.apk' }
+                    }
+                }
+            } catch (Exception e) {
+                logger.warn("Could not copy final APK: " + e.getMessage())
+            }
+        }
+    }
+}

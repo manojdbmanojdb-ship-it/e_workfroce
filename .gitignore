@@ -1,0 +1,41 @@
+# Environment secrets
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build files
+dist/
+build/
+coverage/
+
+# IDE files
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Backup files
+*.zip
+*.bak
+*.backup
+
+# Flutter generated files
+.dart_tool/
+**/.gradle/
+**/build/
+
+# Exclude only the large APK
+Ework-clean/Ework/admin_dashboard/public/downloads/eworkforce-mobile.apk
+
+# Exclude only the large APK
+Ework-clean/Ework/admin_dashboard/public/downloads/eworkforce-mobile.apk
+
+Ework-clean/Ework/supabase/.temp/

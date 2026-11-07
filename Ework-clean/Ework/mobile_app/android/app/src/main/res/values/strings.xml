@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">E-WorkForce</string>
+    <string name="title_activity_main">E-WorkForce</string>
+    <string name="package_name">com.eworkforce.app</string>
+    <string name="custom_url_scheme">com.eworkforce.app</string>
+</resources>

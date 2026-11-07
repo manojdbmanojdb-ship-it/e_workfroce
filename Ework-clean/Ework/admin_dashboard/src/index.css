@@ -1,0 +1,404 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+/* Class-based Dark Mode variant for Tailwind CSS v4 */
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-display: 'Anton', sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+:root {
+  color-scheme: light dark;
+  --font-display: 'Anton', sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --cobalt-primary: #1d4ed8;
+  --cobalt-hover: #1e40af;
+  --surface-obsidian: #080c14;
+  --surface-panel: #0e1726;
+  --surface-border: #1e293b;
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+}
+
+/* Safe Area Inset Utility Classes for Notch & Gesture Navigation */
+.safe-top-padding {
+  padding-top: max(env(safe-area-inset-top, 0px), 0px);
+}
+
+.safe-bottom-padding {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px);
+}
+
+.mobile-app-container {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html:not(.dark) {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Primary Display Font: Google Anton (Ultra-bold, condensed sans-serif, tall uppercase) */
+.font-display {
+  font-family: 'Anton', -apple-system, BlinkMacSystemFont, 'Impact', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.font-display-tight {
+  font-family: 'Anton', -apple-system, BlinkMacSystemFont, 'Impact', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.font-sans {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+html.dark body {
+  background-color: #080c14;
+  color: #f1f5f9;
+}
+
+html:not(.dark) body {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* Accessible focus ring on all interactive elements */
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* High-precision tabular figures for telemetry coordinates, speeds & timestamps */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Cobalt Foundry Technical Grid Canvas (Clean, subtle engineering backdrop) */
+.constellation-bg {
+  background-color: #080c14;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(29, 78, 216, 0.14) 0%, transparent 65%),
+    radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+    linear-gradient(to right, rgba(30, 41, 59, 0.3) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(30, 41, 59, 0.3) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+}
+
+html:not(.dark) .constellation-bg {
+  background-color: #f8fafc;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.08) 0%, transparent 60%),
+    linear-gradient(to right, rgba(226, 232, 240, 0.8) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(226, 232, 240, 0.8) 1px, transparent 1px);
+  background-size: 100% 100%, 48px 48px, 48px 48px;
+}
+
+/* ==========================================================================
+   Energetic Silver-White Cosmic Energy & Beam Animations
+   ========================================================================== */
+
+@keyframes energeticPulse {
+  0%, 100% {
+    opacity: 0.6;
+    stroke-width: 3px;
+  }
+  50% {
+    opacity: 1;
+    stroke-width: 5px;
+  }
+}
+
+@keyframes laserDashStreak {
+  0% {
+    stroke-dashoffset: 1400;
+  }
+  100% {
+    stroke-dashoffset: -1400;
+  }
+}
+
+@keyframes laserDashStreakReverse {
+  0% {
+    stroke-dashoffset: -1400;
+  }
+  100% {
+    stroke-dashoffset: 1400;
+  }
+}
+
+@keyframes silverLightSweep {
+  0% {
+    transform: translateX(-160%) skewX(-25deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.95;
+  }
+  85% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateX(260%) skewX(-25deg);
+    opacity: 0;
+  }
+}
+
+@keyframes energeticTextShine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes energeticAuraFloat {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.12);
+    opacity: 0.65;
+  }
+}
+
+.energetic-silver-pulse {
+  animation: energeticPulse 3s ease-in-out infinite;
+}
+
+.energetic-laser-streak {
+  animation: laserDashStreak 4.5s linear infinite;
+}
+
+.energetic-laser-streak-reverse {
+  animation: laserDashStreakReverse 6.5s linear infinite;
+}
+
+.animate-silver-sweep {
+  animation: silverLightSweep 4.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Metallic Energetic Silver-White Text Shimmer for FIELD EMPLOYEE & MANAGEMENT */
+.energetic-silver-text {
+  background: linear-gradient(
+    115deg,
+    #ffffff 0%,
+    #cbd5e1 15%,
+    #ffffff 35%,
+    #f8fafc 50%,
+    #94a3b8 65%,
+    #ffffff 85%,
+    #e2e8f0 100%
+  );
+  background-size: 200% auto;
+  color: transparent !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  animation: energeticTextShine 3.8s linear infinite;
+  filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.45));
+}
+
+@keyframes laserDashStreakHorizontal {
+  0% {
+    transform: translateX(-150%);
+  }
+  100% {
+    transform: translateX(350%);
+  }
+}
+
+.animate-laser-streak {
+  animation: laserDashStreakHorizontal 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Energetic Silver-White Sheen overlay confined exclusively to the title text */
+.text-energetic-sheen {
+  position: relative;
+  display: inline-block;
+}
+
+.text-energetic-sheen::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    transparent 35%,
+    rgba(255, 255, 255, 0.3) 44%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(226, 232, 240, 0.95) 52%,
+    rgba(255, 255, 255, 0.3) 56%,
+    transparent 65%,
+    transparent 100%
+  );
+  background-size: 250% 100%;
+  mix-blend-mode: color-dodge;
+  animation: energeticSilverSweep 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes energeticSilverSweep {
+  0% {
+    background-position: -150% 0;
+  }
+  100% {
+    background-position: 150% 0;
+  }
+}
+
+/* ==========================================================================
+   Pure Text Energetic Silver-White Cascade Animation (Text Only)
+   ========================================================================== */
+
+@keyframes energeticSilverTextFlow {
+  0% {
+    background-position: 180% 0;
+  }
+  100% {
+    background-position: -180% 0;
+  }
+}
+
+.energetic-silver-line-1 {
+  background: linear-gradient(
+    115deg,
+    #ffffff 0%,
+    #cbd5e1 35%,
+    #ffffff 46%,
+    #ffffff 50%,
+    #cbd5e1 54%,
+    #ffffff 65%,
+    #ffffff 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: energeticSilverTextFlow 3.2s ease-in-out infinite;
+  display: inline-block;
+  filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.35));
+}
+
+.energetic-silver-line-2 {
+  background: linear-gradient(
+    115deg,
+    #7dd3fc 0%,
+    #99f6e4 30%,
+    #ffffff 46%,
+    #ffffff 50%,
+    #67e8f9 54%,
+    #6ee7b7 70%,
+    #a7f3d0 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: energeticSilverTextFlow 3.2s ease-in-out infinite;
+  animation-delay: 0.3s;
+  display: inline-block;
+  filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.4));
+}
+
+.energetic-silver-line-3 {
+  background: linear-gradient(
+    115deg,
+    #ffffff 0%,
+    #cbd5e1 35%,
+    #ffffff 46%,
+    #ffffff 50%,
+    #cbd5e1 54%,
+    #ffffff 65%,
+    #ffffff 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: energeticSilverTextFlow 3.2s ease-in-out infinite;
+  animation-delay: 0.6s;
+  display: inline-block;
+  filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.35));
+}
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  header, aside, .constellation-bg, nav {
+    display: none !important;
+  }
+}
+
+html:not(.dark) .energetic-silver-line-1,
+html:not(.dark) .energetic-silver-line-3 {
+  background: linear-gradient(115deg, #0f172a 0%, #1e293b 35%, #0f172a 50%, #334155 70%, #0f172a 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: none;
+}
+
+html:not(.dark) .energetic-silver-line-2 {
+  background: linear-gradient(115deg, #0284c7 0%, #0d9488 35%, #0284c7 50%, #0369a1 70%, #0f766e 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: none;
+}
+
+/* Accessibility: Honor reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+
+
+

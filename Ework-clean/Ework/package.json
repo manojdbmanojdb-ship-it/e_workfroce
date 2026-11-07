@@ -1,0 +1,24 @@
+{
+  "name": "ework-workspace",
+  "version": "1.0.0",
+  "description": "Ework Enterprise Field Workforce Management Platform",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "start": "node scripts/dev.js",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:dashboard": "npm run dev --prefix admin_dashboard",
+    "dev:mobile": "flutter run --target=lib/main.dart",
+    "build": "npm run build --prefix admin_dashboard",
+    "install:all": "npm install --prefix backend && npm install --prefix admin_dashboard"
+  },
+  "keywords": [
+    "ework",
+    "workforce-management",
+    "geofencing",
+    "field-tracking"
+  ],
+  "author": "Ework",
+  "license": "ISC"
+}

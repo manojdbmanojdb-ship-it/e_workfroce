@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=7" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo-icon.png?v=7" />
+    <link rel="icon" href="/favicon.ico?v=7" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>E-WorkForce | Smart Workforce Management</title>
+    <meta name="description" content="Enterprise field workforce management, real-time GPS tracking, proof of work, geofencing, and AI route optimization." />
+    
+    <!-- Google Fonts: Anton (Primary Display) & Inter (Clean UI & Data) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#050b14" media="(prefers-color-scheme: dark)" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="E-WorkForce" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=7" />
+  </head>
+  <body class="bg-slate-50 dark:bg-[#050b14] text-slate-900 dark:text-slate-100 select-none">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Register PWA Service Worker (only for web browsers, avoiding WebView conflicts on native Android)
+      if ('serviceWorker' in navigator && window.location.protocol.startsWith('http') && !window.Capacitor?.isNativePlatform?.() && window.location.protocol !== 'capacitor:') {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('[PWA] Service Worker registered with scope:', reg.scope))
+            .catch(err => console.warn('[PWA] Service Worker registration failed:', err));
+        });
+      }
+    </script>
+  </body>
+</html>
