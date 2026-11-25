@@ -3,6 +3,7 @@ import type { User, ScreenType, Task, AttendanceRecord, NotificationItem } from 
 import { apiService } from '../services/apiService';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
+import { io } from 'socket.io-client';
 
 interface ToastInfo {
   message: string;
@@ -198,6 +199,58 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       // offline silent fallback
     }
   };
+
+  // Initial data load on mount or user login
+  useEffect(() => {
+    if (currentUser) {
+      refreshData();
+    }
+  }, [currentUser]);
+
+  // Real-time WebSocket synchronization with Laptop / Admin Dashboard
+  useEffect(() => {
+    if (!currentUser) return;
+
+    let socketUrl = 'http://localhost:5000';
+    try {
+      const api = apiService.getBaseUrl();
+      socketUrl = api.replace(/\/api\/?$/, '');
+    } catch {
+      // fallback
+    }
+
+    const socket = io(socketUrl, { transports: ['websocket', 'polling'] });
+
+    socket.on('employee_checked_in', (data: any) => {
+      const myId = String(currentUser.user_id || currentUser.id || '');
+      const incomingId = String(data?.user_id || data?.id || '');
+      if (myId && incomingId && (myId === incomingId || myId.includes(incomingId))) {
+        setTodayAttendance(data);
+      }
+      refreshData();
+    });
+
+    socket.on('employee_checked_out', (data: any) => {
+      const myId = String(currentUser.user_id || currentUser.id || '');
+      const incomingId = String(data?.user_id || data?.id || '');
+      if (myId && incomingId && (myId === incomingId || myId.includes(incomingId))) {
+        setTodayAttendance(data);
+      }
+      refreshData();
+    });
+
+    socket.on('leave_status_updated', () => {
+      refreshData();
+    });
+
+    socket.on('task_updated', () => {
+      refreshData();
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [currentUser]);
 
   return (
     <AppContext.Provider

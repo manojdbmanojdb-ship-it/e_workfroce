@@ -30,6 +30,13 @@ export const SettingsScreen: React.FC = () => {
     showToast('API URL reset to environment default', 'info');
   };
 
+  const handleSetPreset = (presetUrl: string) => {
+    setApiUrl(presetUrl);
+    apiService.setBaseUrl(presetUrl);
+    setIsEditingApi(false);
+    showToast(`Connected: ${presetUrl.includes('onrender') ? 'Cloud Sync (Render)' : 'Local Machine'}`, 'success');
+  };
+
   const handleClearCache = () => {
     const confirmed = window.confirm('Clear local offline cached data and re-fetch from server?');
     if (confirmed) {
@@ -228,6 +235,35 @@ export const SettingsScreen: React.FC = () => {
             {apiUrl}
           </div>
         )}
+
+        {/* Quick Sync Presets */}
+        <div className="space-y-1.5 pt-1">
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Quick Sync Presets</div>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => handleSetPreset('https://ework-backend.onrender.com/api')}
+              className={`py-2 px-2.5 rounded-xl border text-[11px] font-bold flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
+                apiUrl.includes('onrender.com')
+                  ? 'bg-blue-600/15 border-blue-500/40 text-blue-600 dark:text-blue-400 font-extrabold shadow-sm'
+                  : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300'
+              }`}
+            >
+              <span>☁️ Cloud (Anywhere)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSetPreset(`http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:5000/api`)}
+              className={`py-2 px-2.5 rounded-xl border text-[11px] font-bold flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
+                !apiUrl.includes('onrender.com')
+                  ? 'bg-emerald-600/15 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 font-extrabold shadow-sm'
+                  : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300'
+              }`}
+            >
+              <span>💻 Local Machine</span>
+            </button>
+          </div>
+        </div>
 
         <button
           onClick={handleClearCache}

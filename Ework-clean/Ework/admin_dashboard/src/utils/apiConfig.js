@@ -42,6 +42,12 @@ export const getApiBaseUrl = () => {
     return 'http://10.0.2.2:5000';
   }
 
+  // If accessing from another device on local Wi-Fi/LAN (e.g. phone accessing laptop at 10.x.x.x or 192.168.x.x)
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    const protocol = window.location.protocol || 'http:';
+    return `${protocol}//${window.location.hostname}:5000`;
+  }
+
   // If deployed behind Nginx reverse-proxy on port 80 or 443
   if (window.location.port === '' || window.location.port === '80' || window.location.port === '443') {
     return window.location.origin;

@@ -28,8 +28,16 @@ export const getDefaultApiBase = (): string => {
     return 'http://10.0.2.2:5000/api';
   }
 
-  if (typeof window !== 'undefined' && (window.location.port === '' || window.location.port === '80' || window.location.port === '443')) {
-    return `${window.location.origin}/api`;
+  if (typeof window !== 'undefined') {
+    // If accessing from another device on local Wi-Fi/LAN (e.g. phone accessing laptop at 10.x.x.x or 192.168.x.x)
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      const protocol = window.location.protocol || 'http:';
+      return `${protocol}//${window.location.hostname}:5000/api`;
+    }
+
+    if (window.location.port === '' || window.location.port === '80' || window.location.port === '443') {
+      return `${window.location.origin}/api`;
+    }
   }
 
   return 'http://localhost:5000/api';
