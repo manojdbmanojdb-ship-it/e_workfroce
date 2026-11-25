@@ -25,41 +25,39 @@ services:
     name: ework-dashboard
     env: static
     rootDir: Ework-clean/Ework/admin_dashboard
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --include=dev && npm run build
     staticPublishPath: dist
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
     envVars:
+      - key: NODE_VERSION
+        value: 22.12.0
       - key: VITE_SUPABASE_URL
         value: https://agggzpdbqvjiulqtzyrn.supabase.co
       - key: VITE_SUPABASE_ANON_KEY
         value: sb_publishable__8-Vwbf0J08_JQ3cu6ekUw_qX9p5LlW
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: ework-backend
-          property: host
+        value: https://ework-backend.onrender.com
 
   # 3. Mobile App Web Portal Static Site
   - type: web
     name: ework-mobile
     env: static
     rootDir: Ework-clean/Ework/mobile_app
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --include=dev && npm run build
     staticPublishPath: dist
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
     envVars:
+      - key: NODE_VERSION
+        value: 22.12.0
       - key: VITE_SUPABASE_URL
         value: https://agggzpdbqvjiulqtzyrn.supabase.co
       - key: VITE_SUPABASE_ANON_KEY
         value: sb_publishable__8-Vwbf0J08_JQ3cu6ekUw_qX9p5LlW
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: ework-backend
-          property: host
+        value: https://ework-backend.onrender.com
