@@ -3,11 +3,14 @@ import { io } from 'socket.io-client';
 import {
   CheckCircle2, XCircle, Clock, MapPin, Download, AlertTriangle,
   RefreshCw, Plus, X, Calculator, FileText, DollarSign, Award,
-  ArrowUpRight, ShieldCheck, Sparkles, Building2
+  ArrowUpRight, ShieldCheck, Sparkles, Building2, Calendar, Check,
+  UserCheck, AlertCircle
 } from 'lucide-react';
 import SalarySlipModal from '../components/SalarySlipModal';
+import { getApiBaseUrl } from '../utils/apiConfig';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = `${getApiBaseUrl()}/api`;
+const SOCKET_BASE = getApiBaseUrl();
 
 const STATUS_STYLE = {
   present: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 font-bold',
@@ -92,13 +95,20 @@ const INITIAL_PAYROLL_ROSTER = [
 ];
 
 export default function AttendancePage({ darkMode = false }) {
-  const [activeTab, setActiveTab] = useState('attendance'); // 'attendance' | 'payroll'
+  const [activeTab, setActiveTab] = useState('attendance'); // 'attendance' | 'payroll' | 'leaves'
   const [attendance, setAttendance] = useState([]);
   const [sites, setSites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [showCheckInModal, setShowCheckInModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Leave Applications & Approvals State
+  const [leaves, setLeaves] = useState([]);
+  const [leavesLoading, setLeavesLoading] = useState(false);
+  const [leaveFilter, setLeaveFilter] = useState('all'); // 'all' | 'pending' | 'approved' | 'rejected'
+  const [reviewingId, setReviewingId] = useState(null);
+  const [toastMessage, setToastMessage] = useState(null);
 
   // Overtime & Payroll Calculator Configuration
   const [otMultiplier, setOtMultiplier] = useState(1.5); // 1.5x standard or 2.0x double
@@ -129,6 +139,58 @@ export default function AttendancePage({ darkMode = false }) {
     }
   };
 
+  const fetchLeaves = async () => {
+    try {
+      setLeavesLoading(true);
+      const res = await fetch(`${API_BASE}/leaves`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data)) {
+        setLeaves(data.data);
+      }
+    } catch (err) {
+      console.error('Failed to load leaves:', err);
+    } finally {
+      setLeavesLoading(false);
+    }
+  };
+
+  const handleReviewLeave = async (leaveId, newStatus) => {
+    try {
+      setReviewingId(leaveId);
+      let reviewNotes = '';
+      if (newStatus === 'rejected') {
+        const promptVal = window.prompt(
+          'Enter reason for rejecting leave request (or click OK for default):',
+          'High operational workload on selected dates'
+        );
+        if (promptVal === null) {
+          setReviewingId(null);
+          return;
+        }
+        reviewNotes = promptVal.trim() || 'Manager declined due to workload';
+      }
+
+      const res = await fetch(`${API_BASE}/leaves/${leaveId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus, reviewNotes })
+      });
+      const data = await res.json();
+      if (data.success && data.data) {
+        setLeaves(prev => prev.map(l => l.id === leaveId ? data.data : l));
+        setToastMessage(`✓ Leave request #${leaveId.slice(-6).toUpperCase()} ${newStatus === 'approved' ? 'APPROVED' : 'REJECTED'} successfully!`);
+        setTimeout(() => setToastMessage(null), 4000);
+      } else {
+        alert(data.error || 'Failed to update leave');
+      }
+    } catch (err) {
+      console.error('Error reviewing leave:', err);
+      alert('Failed to connect to backend server');
+    } finally {
+      setReviewingId(null);
+    }
+  };
+
   const fetchSites = async () => {
     try {
       const supabaseUrl = import.meta.env?.VITE_SUPABASE_URL || 'https://agggzpdbqvjiulqtzyrn.supabase.co';
@@ -153,13 +215,20 @@ export default function AttendancePage({ darkMode = false }) {
   useEffect(() => {
     fetchAttendance();
     fetchSites();
+    fetchLeaves();
 
-    const socket = io('http://localhost:5000');
+    const socket = io(SOCKET_BASE);
     socket.on('employee_checked_in', () => {
       fetchAttendance();
     });
     socket.on('employee_checked_out', () => {
       fetchAttendance();
+    });
+    socket.on('leave_applied', (newLeave) => {
+      setLeaves(prev => [newLeave, ...prev.filter(l => l.id !== newLeave.id)]);
+    });
+    socket.on('leave_status_updated', (updated) => {
+      setLeaves(prev => prev.map(l => l.id === updated.id ? updated : l));
     });
 
     return () => socket.disconnect();
@@ -327,6 +396,22 @@ export default function AttendancePage({ darkMode = false }) {
             <Calculator className="h-3.5 w-3.5" />
             <span>Overtime &amp; Payroll Calculator</span>
             <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">1.5x OT</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('leaves')}
+            className={`flex items-center space-x-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'leaves'
+                ? 'bg-purple-500/20 text-purple-400 border border-purple-500/40 shadow-sm shadow-purple-500/10'
+                : darkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+            }`}
+          >
+            <Calendar className="h-3.5 w-3.5" />
+            <span>Leave Approvals</span>
+            {leaves.filter(l => l.status === 'pending').length > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500 text-white font-bold animate-pulse">
+                {leaves.filter(l => l.status === 'pending').length}
+              </span>
+            )}
           </button>
         </div>
       </div>
@@ -694,6 +779,260 @@ export default function AttendancePage({ darkMode = false }) {
                     </tr>
                   );
                 })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ===================== VIEW 3: LEAVE APPROVALS ===================== */}
+      {activeTab === 'leaves' && (
+        <div className="space-y-6 animate-in fade-in duration-200">
+          {/* Toast Alert */}
+          {toastMessage && (
+            <div className="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 text-xs font-bold flex items-center justify-between animate-in slide-in-from-top-2">
+              <div className="flex items-center space-x-2">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+                <span>{toastMessage}</span>
+              </div>
+              <button onClick={() => setToastMessage(null)} className="text-emerald-400 hover:text-white cursor-pointer">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+
+          {/* Metric Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className={`p-4 rounded-2xl border transition-all ${
+              darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+            }`}>
+              <div className="flex items-center justify-between text-slate-400">
+                <span className="text-[11px] font-bold uppercase tracking-wider">Total Requests</span>
+                <Calendar className="h-4 w-4 text-slate-400" />
+              </div>
+              <div className="text-2xl font-black mt-1 font-mono">{leaves.length}</div>
+              <span className="text-[10px] text-slate-500">Across all field staff</span>
+            </div>
+
+            <div className={`p-4 rounded-2xl border transition-all ${
+              darkMode ? 'bg-amber-500/10 border-amber-500/30' : 'bg-amber-50 border-amber-200 shadow-xs'
+            }`}>
+              <div className="flex items-center justify-between text-amber-500 dark:text-amber-400">
+                <span className="text-[11px] font-bold uppercase tracking-wider">Pending Review</span>
+                <Clock className="h-4 w-4" />
+              </div>
+              <div className="text-2xl font-black mt-1 font-mono text-amber-600 dark:text-amber-400">
+                {leaves.filter(l => l.status === 'pending').length}
+              </div>
+              <span className="text-[10px] text-amber-700/70 dark:text-amber-300/70">Action required by Admin</span>
+            </div>
+
+            <div className={`p-4 rounded-2xl border transition-all ${
+              darkMode ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200 shadow-xs'
+            }`}>
+              <div className="flex items-center justify-between text-emerald-500 dark:text-emerald-400">
+                <span className="text-[11px] font-bold uppercase tracking-wider">Approved</span>
+                <CheckCircle2 className="h-4 w-4" />
+              </div>
+              <div className="text-2xl font-black mt-1 font-mono text-emerald-600 dark:text-emerald-400">
+                {leaves.filter(l => l.status === 'approved').length}
+              </div>
+              <span className="text-[10px] text-emerald-700/70 dark:text-emerald-300/70">Authorized leaves</span>
+            </div>
+
+            <div className={`p-4 rounded-2xl border transition-all ${
+              darkMode ? 'bg-red-500/10 border-red-500/30' : 'bg-red-50 border-red-200 shadow-xs'
+            }`}>
+              <div className="flex items-center justify-between text-red-500 dark:text-red-400">
+                <span className="text-[11px] font-bold uppercase tracking-wider">Rejected</span>
+                <XCircle className="h-4 w-4" />
+              </div>
+              <div className="text-2xl font-black mt-1 font-mono text-red-600 dark:text-red-400">
+                {leaves.filter(l => l.status === 'rejected').length}
+              </div>
+              <span className="text-[10px] text-red-700/70 dark:text-red-300/70">Declined requests</span>
+            </div>
+          </div>
+
+          {/* Controls Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex space-x-2">
+              {['all', 'pending', 'approved', 'rejected'].map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setLeaveFilter(tab)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    leaveFilter === tab
+                      ? 'bg-purple-500/20 text-purple-400 border border-purple-500/40'
+                      : darkMode
+                        ? 'bg-slate-900/60 text-slate-400 border border-slate-800 hover:border-slate-700'
+                        : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 shadow-xs'
+                  }`}
+                >
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  {tab === 'pending' && leaves.filter(l => l.status === 'pending').length > 0 && (
+                    <span className="ml-1.5 px-1.5 py-0.2 rounded-full text-[9px] bg-amber-500 text-white font-bold">
+                      {leaves.filter(l => l.status === 'pending').length}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={fetchLeaves}
+              className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center space-x-1.5 text-xs font-bold ${
+                darkMode
+                  ? 'border-slate-700/80 bg-slate-900/60 hover:bg-slate-800 text-slate-300'
+                  : 'border-slate-300 bg-white hover:bg-slate-100 text-slate-700 shadow-xs'
+              }`}
+            >
+              <RefreshCw className={`h-4 w-4 ${leavesLoading ? 'animate-spin text-purple-400' : ''}`} />
+              <span>Refresh Applications</span>
+            </button>
+          </div>
+
+          {/* Table */}
+          <div className={`rounded-2xl border overflow-hidden shadow-xs transition-colors ${
+            darkMode ? 'border-slate-800/80 bg-slate-900/40' : 'border-slate-200 bg-white'
+          }`}>
+            <table className="w-full text-left text-xs">
+              <thead className={`border-b text-[11px] font-bold uppercase tracking-wider ${
+                darkMode ? 'bg-slate-900/80 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
+              }`}>
+                <tr>
+                  <th className="px-4 py-3">Employee</th>
+                  <th className="px-3 py-3">Leave Category</th>
+                  <th className="px-3 py-3">Dates &amp; Duration</th>
+                  <th className="px-4 py-3">Reason / Remarks</th>
+                  <th className="px-3 py-3">Applied At</th>
+                  <th className="px-3 py-3">Status</th>
+                  <th className="px-4 py-3 text-center">Manager Decision</th>
+                </tr>
+              </thead>
+              <tbody className={`divide-y ${darkMode ? 'divide-slate-800/60' : 'divide-slate-100'}`}>
+                {leaves
+                  .filter(l => leaveFilter === 'all' || l.status === leaveFilter)
+                  .map(leave => {
+                    const isPending = leave.status === 'pending';
+                    const isApproved = leave.status === 'approved';
+                    const isRejected = leave.status === 'rejected';
+
+                    return (
+                      <tr key={leave.id} className={`transition-colors ${
+                        darkMode ? 'hover:bg-slate-800/30' : 'hover:bg-slate-50/70'
+                      }`}>
+                        {/* Employee */}
+                        <td className="px-4 py-3">
+                          <div className="font-bold">{leave.employee_name || 'Staff Member'}</div>
+                          <div className="text-[10px] text-slate-400 font-mono">
+                            {leave.employee_email || leave.user_id} · {leave.employee_role || 'Field Staff'}
+                          </div>
+                        </td>
+
+                        {/* Category */}
+                        <td className="px-3 py-3">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                            leave.leave_type?.toLowerCase().includes('sick')
+                              ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30'
+                              : leave.leave_type?.toLowerCase().includes('annual')
+                              ? 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30'
+                              : 'bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-500/30'
+                          }`}>
+                            {leave.leave_type} Leave
+                          </span>
+                        </td>
+
+                        {/* Dates */}
+                        <td className="px-3 py-3">
+                          <div className="font-bold text-xs">{leave.start_date} <span className="text-slate-400 font-normal">to</span> {leave.end_date}</div>
+                          <div className="text-[10px] text-slate-500 font-mono mt-0.5">
+                            {leave.days} {Number(leave.days) === 1 ? 'day' : 'days'}
+                          </div>
+                        </td>
+
+                        {/* Reason */}
+                        <td className="px-4 py-3 max-w-xs">
+                          <div className={`p-2 rounded-xl text-[11px] border ${
+                            darkMode ? 'bg-slate-950/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
+                          }`}>
+                            "{leave.reason || 'Personal reasons'}"
+                          </div>
+                        </td>
+
+                        {/* Applied At */}
+                        <td className="px-3 py-3 text-slate-400 text-[11px] font-mono whitespace-nowrap">
+                          {leave.created_at ? new Date(leave.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent'}
+                        </td>
+
+                        {/* Status */}
+                        <td className="px-3 py-3">
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider inline-flex items-center space-x-1 border ${
+                            isApproved
+                              ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                              : isPending
+                              ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30'
+                              : 'bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/30'
+                          }`}>
+                            {isApproved && <CheckCircle2 className="h-3 w-3 mr-1 shrink-0" />}
+                            {isPending && <Clock className="h-3 w-3 mr-1 shrink-0" />}
+                            {isRejected && <XCircle className="h-3 w-3 mr-1 shrink-0" />}
+                            <span>{leave.status}</span>
+                          </span>
+                        </td>
+
+                        {/* Manager Decision (Approve / Reject) */}
+                        <td className="px-4 py-3 text-center">
+                          {isPending ? (
+                            <div className="flex items-center justify-center space-x-2">
+                              <button
+                                type="button"
+                                disabled={reviewingId === leave.id}
+                                onClick={() => handleReviewLeave(leave.id, 'approved')}
+                                className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-[11px] shadow-sm shadow-emerald-600/30 transition-all cursor-pointer disabled:opacity-50"
+                              >
+                                <Check className="h-3.5 w-3.5" />
+                                <span>Approve</span>
+                              </button>
+                              <button
+                                type="button"
+                                disabled={reviewingId === leave.id}
+                                onClick={() => handleReviewLeave(leave.id, 'rejected')}
+                                className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 active:scale-95 text-white font-bold text-[11px] shadow-sm shadow-red-600/30 transition-all cursor-pointer disabled:opacity-50"
+                              >
+                                <X className="h-3.5 w-3.5" />
+                                <span>Reject</span>
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-center space-x-2">
+                              {isApproved ? (
+                                <button
+                                  type="button"
+                                  disabled={reviewingId === leave.id}
+                                  onClick={() => handleReviewLeave(leave.id, 'rejected')}
+                                  className="text-[10px] text-slate-400 hover:text-red-400 underline cursor-pointer"
+                                  title="Change decision to rejected"
+                                >
+                                  Revoke to Reject
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  disabled={reviewingId === leave.id}
+                                  onClick={() => handleReviewLeave(leave.id, 'approved')}
+                                  className="text-[10px] text-slate-400 hover:text-emerald-400 underline cursor-pointer"
+                                  title="Change decision to approved"
+                                >
+                                  Re-Approve
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>

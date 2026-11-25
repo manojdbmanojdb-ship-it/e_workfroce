@@ -851,9 +851,10 @@ export async function applyEmployeeLeave(req, res) {
     }
 
     const leaveId = `leave-${Date.now()}`;
+    const initialStatus = req.body.status || 'pending';
     db.prepare(`
       INSERT INTO leave_requests (id, user_id, leave_type, start_date, end_date, days, reason, status, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, 'approved', ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       leaveId,
       employee.user_id,
@@ -862,13 +863,36 @@ export async function applyEmployeeLeave(req, res) {
       endDate,
       days || 1,
       reason || 'Personal time off',
+      initialStatus,
       new Date().toISOString()
     );
 
+    const createdLeave = {
+      id: leaveId,
+      user_id: employee.user_id,
+      employee_name: employee.name,
+      employee_email: employee.email,
+      employee_role: employee.role,
+      leave_type: leaveType || 'annual',
+      start_date: startDate,
+      end_date: endDate,
+      days: days || 1,
+      reason: reason || 'Personal time off',
+      status: initialStatus,
+      created_at: new Date().toISOString()
+    };
+
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('leave_applied', createdLeave);
+    }
+
     res.json({
       success: true,
-      message: 'Leave application submitted and auto-approved by supervisor.',
-      data: { id: leaveId, leaveType, startDate, endDate, days: days || 1, status: 'approved' }
+      message: initialStatus === 'approved' 
+        ? 'Leave application submitted and auto-approved.'
+        : 'Leave application submitted and awaiting manager review.',
+      data: createdLeave
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -898,6 +922,97 @@ export async function getEmployeeLeaves(req, res) {
         balances,
         totalUsedDays: usedDays
       }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+}
+
+/**
+ * GET /api/leaves - All leave applications for Admin review
+ */
+export async function getAllLeaves(req, res) {
+  try {
+    let leaves = db.prepare(`
+      SELECT lr.*, u.name as employee_name, u.email as employee_email, u.role as employee_role, u.department
+      FROM leave_requests lr
+      LEFT JOIN users u ON lr.user_id = u.user_id
+      ORDER BY lr.created_at DESC
+    `).all();
+
+    // Seed initial realistic leave applications if none exist
+    if (!leaves || leaves.length === 0) {
+      const now = Date.now();
+      const initialLeaves = [
+        { id: 'lv-req-101', user_id: 'usr-102', leave_type: 'Casual', start_date: '2026-11-28', end_date: '2026-11-29', days: 2, reason: 'Family marriage ceremony in hometown', status: 'pending', created_at: new Date(now - 3600000 * 2).toISOString() },
+        { id: 'lv-req-102', user_id: 'usr-103', leave_type: 'Sick', start_date: '2026-11-26', end_date: '2026-11-26', days: 1, reason: 'Severe headache and doctor visit', status: 'pending', created_at: new Date(now - 3600000 * 6).toISOString() },
+        { id: 'lv-req-103', user_id: 'usr-104', leave_type: 'Annual', start_date: '2026-10-14', end_date: '2026-10-18', days: 5, reason: 'Planned festival vacation', status: 'approved', created_at: '2026-10-01T09:30:00.000Z' },
+        { id: 'lv-req-104', user_id: 'usr-105', leave_type: 'Casual', start_date: '2026-10-05', end_date: '2026-10-06', days: 2, reason: 'Personal vehicle registration', status: 'rejected', created_at: '2026-10-02T11:15:00.000Z' }
+      ];
+      for (const l of initialLeaves) {
+        db.prepare(`
+          INSERT OR REPLACE INTO leave_requests (id, user_id, leave_type, start_date, end_date, days, reason, status, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(l.id, l.user_id, l.leave_type, l.start_date, l.end_date, l.days, l.reason, l.status, l.created_at);
+      }
+      leaves = db.prepare(`
+        SELECT lr.*, u.name as employee_name, u.email as employee_email, u.role as employee_role, u.department
+        FROM leave_requests lr
+        LEFT JOIN users u ON lr.user_id = u.user_id
+        ORDER BY lr.created_at DESC
+      `).all();
+    }
+
+    res.json({ success: true, data: leaves });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+}
+
+/**
+ * PATCH /api/leaves/:id/status - Admin/Manager Approve or Reject a leave application
+ */
+export async function reviewLeaveRequest(req, res) {
+  try {
+    const { id } = req.params;
+    const { status, reviewNotes } = req.body; // 'approved' | 'rejected'
+
+    if (!['approved', 'rejected', 'pending'].includes(status)) {
+      return res.status(400).json({ success: false, error: 'Status must be approved or rejected' });
+    }
+
+    const existing = db.prepare('SELECT * FROM leave_requests WHERE id = ?').get(id);
+    if (!existing) {
+      return res.status(404).json({ success: false, error: 'Leave request not found' });
+    }
+
+    let updatedReason = existing.reason || '';
+    if (reviewNotes && !updatedReason.includes('[Review:')) {
+      updatedReason = `${updatedReason} [Review: ${reviewNotes}]`;
+    }
+
+    db.prepare(`
+      UPDATE leave_requests
+      SET status = ?, reason = ?
+      WHERE id = ?
+    `).run(status, updatedReason, id);
+
+    const updated = db.prepare(`
+      SELECT lr.*, u.name as employee_name, u.email as employee_email, u.role as employee_role, u.department
+      FROM leave_requests lr
+      LEFT JOIN users u ON lr.user_id = u.user_id
+      WHERE lr.id = ?
+    `).get(id);
+
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('leave_status_updated', updated);
+    }
+
+    res.json({
+      success: true,
+      message: `Leave application marked as ${status}.`,
+      data: updated
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });

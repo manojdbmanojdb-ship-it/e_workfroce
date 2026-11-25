@@ -29,7 +29,9 @@ import {
   getEmployeeProfile,
   updateEmployeeProfile,
   applyEmployeeLeave,
-  getEmployeeLeaves
+  getEmployeeLeaves,
+  getAllLeaves,
+  reviewLeaveRequest
 } from '../controllers/employeeController.js';
 import {
   getPlans,
@@ -85,10 +87,12 @@ router.get('/employee/leaves', getEmployeeLeaves);
 // 2. MANAGER & SHARED CORE API ENDPOINTS
 // ==========================================
 
-// Attendance (Shared)
+// Attendance & Leaves (Shared)
 router.post('/attendance/check-in', checkIn);
 router.patch('/attendance/check-out/:id', checkOut);
 router.get('/attendance', getAttendance);
+router.get('/leaves', getAllLeaves);
+router.patch('/leaves/:id/status', reviewLeaveRequest);
 
 // Tasks (Shared & Manager Dispatch)
 router.get('/tasks', getTasks);
