@@ -11,7 +11,10 @@ export const getDefaultApiBase = (): string => {
   // Environment variable (Vite production build / cloud deployment)
   const envUrl = (import.meta as any).env?.VITE_API_URL;
   if (envUrl) {
-    const trimmed = envUrl.replace(/\/+$/, '');
+    let trimmed = envUrl.replace(/\/+$/, '');
+    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+      trimmed = `https://${trimmed}`;
+    }
     return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`;
   }
 

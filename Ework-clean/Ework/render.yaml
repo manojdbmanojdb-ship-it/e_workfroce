@@ -1,5 +1,5 @@
 services:
-  # Backend Web Service (Node.js Express + SQLite + WebSocket)
+  # 1. Backend Web Service (Node.js Express + SQLite + WebSocket)
   - type: web
     name: ework-backend
     env: node
@@ -10,17 +10,17 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 22.12.0
-      - key: PORT
-        value: 5000
       - key: SUPABASE_URL
         value: https://agggzpdbqvjiulqtzyrn.supabase.co
       - key: SUPABASE_ANON_KEY
         value: sb_publishable__8-Vwbf0J08_JQ3cu6ekUw_qX9p5LlW
-      - key: SUPABASE_SERVICE_ROLE_KEY
-        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        value: https://agggzpdbqvjiulqtzyrn.supabase.co
+      - key: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+        value: sb_publishable__8-Vwbf0J08_JQ3cu6ekUw_qX9p5LlW
     healthCheckPath: /api/health
 
-  # Admin Dashboard Static Site
+  # 2. Admin Dashboard Static Site
   - type: web
     name: ework-dashboard
     env: static
@@ -36,8 +36,13 @@ services:
         value: https://agggzpdbqvjiulqtzyrn.supabase.co
       - key: VITE_SUPABASE_ANON_KEY
         value: sb_publishable__8-Vwbf0J08_JQ3cu6ekUw_qX9p5LlW
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: ework-backend
+          property: host
 
-  # Mobile App Web Portal Static Site
+  # 3. Mobile App Web Portal Static Site
   - type: web
     name: ework-mobile
     env: static
@@ -53,3 +58,8 @@ services:
         value: https://agggzpdbqvjiulqtzyrn.supabase.co
       - key: VITE_SUPABASE_ANON_KEY
         value: sb_publishable__8-Vwbf0J08_JQ3cu6ekUw_qX9p5LlW
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: ework-backend
+          property: host

@@ -17,7 +17,11 @@ export const getApiBaseUrl = () => {
   
   // Environment variable (Vite production build / cloud deployment)
   if (import.meta.env?.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL.replace(/\/+$/, '');
+    let url = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = `https://${url}`;
+    }
+    return url;
   }
 
   // Custom user-configured backend endpoint (e.g. settings / QR scan)
