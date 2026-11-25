@@ -1,8 +1,43 @@
 // Comprehensive Verification Suite for Freemium & Paid Subscription SaaS Architecture
+import { fork } from 'node:child_process';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import db from './src/config/database.js';
 import { PLANS_CONFIG } from './src/controllers/subscriptionController.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const API_BASE = 'http://localhost:5000/api';
+
+async function ensureServerRunning() {
+  try {
+    const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(1000) });
+    if (res.ok) return null;
+  } catch {
+    // Server not running yet
+  }
+
+  console.log('Backend server not detected on port 5000. Launching background server for test suite...');
+  const serverPath = path.resolve(__dirname, 'src/server.js');
+  const serverProc = fork(serverPath, [], { stdio: 'ignore' });
+
+  for (let i = 0; i < 30; i++) {
+    await new Promise((r) => setTimeout(r, 300));
+    try {
+      const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(1000) });
+      if (res.ok) {
+        console.log('✅ Backend server ready on port 5000.\n');
+        return serverProc;
+      }
+    } catch {
+      // Waiting
+    }
+  }
+
+  serverProc.kill();
+  throw new Error('Failed to start backend server within 10 seconds.');
+}
 
 async function runSaaSTests() {
   console.log('===============================================================');
@@ -11,6 +46,7 @@ async function runSaaSTests() {
 
   let passed = 0;
   let failed = 0;
+  let serverProc = null;
 
   function assert(condition, message) {
     if (condition) {
@@ -23,6 +59,7 @@ async function runSaaSTests() {
   }
 
   try {
+    serverProc = await ensureServerRunning();
     // 1. Subscription Plans API
     console.log('--- Step 1: Verify Subscription Plans ---');
     const plansRes = await fetch(`${API_BASE}/subscriptions/plans`);
@@ -257,7 +294,14 @@ async function runSaaSTests() {
 
   } catch (err) {
     console.error('Fatal Test Error:', err);
+    process.exit(1);
+  } finally {
+    if (serverProc) {
+      serverProc.kill();
+    }
   }
+
+  process.exit(failed > 0 ? 1 : 0);
 }
 
 runSaaSTests();

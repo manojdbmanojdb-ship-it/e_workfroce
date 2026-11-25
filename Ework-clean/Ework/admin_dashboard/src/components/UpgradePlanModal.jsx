@@ -10,8 +10,6 @@ export default function UpgradePlanModal({
   onBuyLicense,
   darkMode = false
 }) {
-  if (!isOpen) return null;
-
   const [licenseKey, setLicenseKey] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -63,6 +61,8 @@ export default function UpgradePlanModal({
       setLoading(false);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">

@@ -1,7 +1,42 @@
 // E-Workforce End-to-End Workflow Verification Suite
 // Tests all 11 required workflow steps + security/RBAC constraints
+import { fork } from 'node:child_process';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const API_BASE = 'http://localhost:5000/api';
+
+async function ensureServerRunning() {
+  try {
+    const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(1000) });
+    if (res.ok) return null;
+  } catch {
+    // Server not running yet
+  }
+
+  console.log('Backend server not detected on port 5000. Launching background server for test suite...');
+  const serverPath = path.resolve(__dirname, 'src/server.js');
+  const serverProc = fork(serverPath, [], { stdio: 'ignore' });
+
+  for (let i = 0; i < 30; i++) {
+    await new Promise((r) => setTimeout(r, 300));
+    try {
+      const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(1000) });
+      if (res.ok) {
+        console.log('✅ Backend server ready on port 5000.\n');
+        return serverProc;
+      }
+    } catch {
+      // Waiting
+    }
+  }
+
+  serverProc.kill();
+  throw new Error('Failed to start backend server within 10 seconds.');
+}
 
 async function runTestSuite() {
   console.log('====================================================');
@@ -10,6 +45,7 @@ async function runTestSuite() {
 
   let passed = 0;
   let failed = 0;
+  let serverProc = null;
 
   function assert(condition, testName) {
     if (condition) {
@@ -22,6 +58,7 @@ async function runTestSuite() {
   }
 
   try {
+    serverProc = await ensureServerRunning();
     // 1. Manager logs in
     console.log('--- Step 1: Manager Authentication ---');
     const mgrRes = await fetch(`${API_BASE}/auth/sign-in`, {
@@ -34,6 +71,7 @@ async function runTestSuite() {
 
     // 2. Manager creates an employee
     console.log('\n--- Step 2: Employee Provisioning ---');
+    const employeeName = `Arjun Mehta ${Date.now()}`;
     const newEmpEmail = `test.tech.${Date.now()}@ework.com`;
     const newEmpRes = await fetch(`${API_BASE}/auth/sign-up`, {
       method: 'POST',
@@ -41,7 +79,7 @@ async function runTestSuite() {
       body: JSON.stringify({
         email: newEmpEmail,
         password: 'Workforce@2026',
-        name: 'Arjun Mehta',
+        name: employeeName,
         role: 'Field Technician',
         department: 'Delhi Central Hub'
       })
@@ -58,7 +96,7 @@ async function runTestSuite() {
       body: JSON.stringify({
         title: 'High-Voltage Transformer Oil Filtration #T-999',
         description: 'Perform dehydration and breakdown voltage test on 11kV transformer oil.',
-        assignedTo: 'Arjun Mehta',
+        assignedTo: employeeName,
         assignedBy: 'Rajesh Kumar (Operations Manager)',
         address: 'Okhla Industrial Area, Phase III, Delhi',
         priority: 'urgent',
@@ -66,7 +104,7 @@ async function runTestSuite() {
       })
     });
     const taskData = await taskRes.json();
-    assert(taskData.success && taskData.data?.id, '3. Manager successfully assigns task to Arjun Mehta');
+    assert(taskData.success && taskData.data?.id, `3. Manager successfully assigns task to ${employeeName}`);
     const taskId = taskData.data.id;
 
     // 4. Employee logs in separately
@@ -187,11 +225,16 @@ async function runTestSuite() {
     console.log(`🏁 Test Summary: ${passed} Passed, ${failed} Failed`);
     console.log('====================================================');
 
-    process.exit(failed > 0 ? 1 : 0);
   } catch (err) {
     console.error('Fatal test error:', err);
     process.exit(1);
+  } finally {
+    if (serverProc) {
+      serverProc.kill();
+    }
   }
+
+  process.exit(failed > 0 ? 1 : 0);
 }
 
 runTestSuite();

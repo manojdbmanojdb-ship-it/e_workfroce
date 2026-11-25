@@ -10,8 +10,6 @@ export default function SuperAdminDashboardModal({
   onClose,
   darkMode = false
 }) {
-  if (!isOpen) return null;
-
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'organizations' | 'licenses' | 'payments' | 'settings'
 
   // Data states
@@ -68,8 +66,10 @@ export default function SuperAdminDashboardModal({
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (isOpen) {
+      loadData();
+    }
+  }, [isOpen]);
 
   const showNotification = (msg) => {
     setSuccessToast(msg);
@@ -182,6 +182,8 @@ export default function SuperAdminDashboardModal({
     if (licFilter === 'revoked') return lic.status === 'revoked' || lic.status === 'suspended';
     return true;
   });
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">

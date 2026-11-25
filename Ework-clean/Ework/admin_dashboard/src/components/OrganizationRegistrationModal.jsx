@@ -30,8 +30,6 @@ export default function OrganizationRegistrationModal({
   onRegistrationSuccess,
   darkMode = false
 }) {
-  if (!isOpen) return null;
-
   const [plan, setPlan] = useState(initialPlan);
   const [orgName, setOrgName] = useState(prefilledOrgName);
   const [businessEmail, setBusinessEmail] = useState(prefilledEmail);
@@ -151,6 +149,8 @@ export default function OrganizationRegistrationModal({
   };
 
   const isPaidPlan = plan === 'professional' || plan === 'enterprise';
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">

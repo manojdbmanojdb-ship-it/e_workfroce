@@ -11,7 +11,10 @@
     "dev:dashboard": "npm run dev --prefix admin_dashboard",
     "dev:mobile": "flutter run --target=lib/main.dart",
     "build": "npm run build --prefix admin_dashboard",
-    "install:all": "npm install --prefix backend && npm install --prefix admin_dashboard"
+    "install:all": "npm install --prefix backend && npm install --prefix admin_dashboard",
+    "test": "npm test --prefix backend",
+    "test:saas": "npm run test:saas --prefix backend",
+    "test:e2e": "npm run test:e2e --prefix backend"
   },
   "keywords": [
     "ework",

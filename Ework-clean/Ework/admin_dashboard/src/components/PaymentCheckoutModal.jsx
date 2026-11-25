@@ -9,8 +9,6 @@ export default function PaymentCheckoutModal({
   onPaymentSuccess,
   darkMode = false
 }) {
-  if (!isOpen) return null;
-
   const plan = PLANS.find(p => p.id === selectedPlanId) || PLANS[1]; // default to professional
 
   const [paymentTab, setPaymentTab] = useState('online'); // 'online' | 'upi'
@@ -115,6 +113,8 @@ export default function PaymentCheckoutModal({
       setTimeout(() => setCopied(false), 2500);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
