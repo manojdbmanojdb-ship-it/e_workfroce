@@ -25,7 +25,7 @@ services:
     name: ework-dashboard
     env: static
     rootDir: Ework-clean/Ework/admin_dashboard
-    buildCommand: npm install --include=dev && npm run build
+    buildCommand: npm install && npm run build
     staticPublishPath: dist
     routes:
       - type: rewrite
@@ -46,7 +46,7 @@ services:
     name: ework-mobile
     env: static
     rootDir: Ework-clean/Ework/mobile_app
-    buildCommand: npm install --include=dev && npm run build
+    buildCommand: npm install && npm run build
     staticPublishPath: dist
     routes:
       - type: rewrite
