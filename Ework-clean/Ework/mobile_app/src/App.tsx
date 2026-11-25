@@ -21,6 +21,40 @@ import { SettingsScreen } from './screens/SettingsScreen';
 import { App as CapApp } from '@capacitor/app';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
+class ScreenErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: string }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: '' };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error: error.message };
+  }
+
+  componentDidCatch(error: Error, errorInfo: any) {
+    console.warn('[ScreenErrorBoundary caught]:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-6 text-center space-y-3 my-12">
+          <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 rounded-2xl max-w-xs mx-auto text-xs font-semibold">
+            {this.state.error || 'An error occurred loading this view.'}
+          </div>
+          <button
+            onClick={() => this.setState({ hasError: false, error: '' })}
+            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer"
+          >
+            Reload Screen
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 const ScreenRouter: React.FC = () => {
   const { currentScreen, selectedTaskId, navigateTo, toast } = useApp();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -91,17 +125,19 @@ const ScreenRouter: React.FC = () => {
 
       {/* Main Screen Content Area */}
       <main className="flex-1 w-full max-w-lg mx-auto overflow-y-auto no-scrollbar">
-        {currentScreen === 'home' && <HomeScreen />}
-        {currentScreen === 'tasks' && <TasksScreen />}
-        {currentScreen === 'task_details' && <TaskDetailsScreen />}
-        {currentScreen === 'attendance' && <AttendanceScreen />}
-        {currentScreen === 'location' && <LocationScreen />}
-        {currentScreen === 'maps' && <MapsScreen />}
-        {currentScreen === 'leaves' && <LeavesScreen />}
-        {currentScreen === 'notifications' && <NotificationsScreen />}
-        {currentScreen === 'reports' && <ReportsScreen />}
-        {currentScreen === 'profile' && <ProfileScreen />}
-        {currentScreen === 'settings' && <SettingsScreen />}
+        <ScreenErrorBoundary>
+          {currentScreen === 'home' && <HomeScreen />}
+          {currentScreen === 'tasks' && <TasksScreen />}
+          {currentScreen === 'task_details' && <TaskDetailsScreen />}
+          {currentScreen === 'attendance' && <AttendanceScreen />}
+          {currentScreen === 'location' && <LocationScreen />}
+          {currentScreen === 'maps' && <MapsScreen />}
+          {currentScreen === 'leaves' && <LeavesScreen />}
+          {currentScreen === 'notifications' && <NotificationsScreen />}
+          {currentScreen === 'reports' && <ReportsScreen />}
+          {currentScreen === 'profile' && <ProfileScreen />}
+          {currentScreen === 'settings' && <SettingsScreen />}
+        </ScreenErrorBoundary>
       </main>
 
       {/* Floating Global Toast Notification Overlay */}

@@ -184,9 +184,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setUnreadCount(unread);
       }
 
-      if (attRes.data && attRes.data.length > 0) {
+      if (attRes.data) {
+        const list: AttendanceRecord[] = Array.isArray(attRes.data)
+          ? attRes.data
+          : Array.isArray((attRes.data as any)?.records)
+          ? (attRes.data as any).records
+          : [];
         const todayStr = new Date().toISOString().split('T')[0];
-        const match = attRes.data.find((a: AttendanceRecord) => a.date === todayStr);
+        const match = list.find((a: AttendanceRecord) => a.date === todayStr);
         setTodayAttendance(match || null);
       }
     } catch (e) {

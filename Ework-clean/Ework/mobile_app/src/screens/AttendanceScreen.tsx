@@ -18,16 +18,45 @@ export const AttendanceScreen: React.FC = () => {
   const [processing, setProcessing] = useState(false);
   const [isOnBreak, setIsOnBreak] = useState(false);
 
+  const formatTimeSafe = (timeStr?: string | null) => {
+    if (!timeStr) return '--:--';
+    try {
+      const d = new Date(timeStr);
+      return isNaN(d.getTime()) ? '--:--' : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch {
+      return '--:--';
+    }
+  };
+
+  const formatDateSafe = (dateStr?: string | null) => {
+    if (!dateStr) return 'Today';
+    try {
+      const d = new Date(dateStr);
+      return isNaN(d.getTime()) ? String(dateStr) : d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+    } catch {
+      return String(dateStr);
+    }
+  };
+
   const loadAttendance = async () => {
     setLoading(true);
     try {
       const res = await apiService.getAttendance();
-      if (res.success && res.data) {
-        setHistory(res.data);
-        const todayStr = new Date().toISOString().split('T')[0];
-        const today = res.data.find(a => a.date === todayStr);
-        if (today) setTodayAttendance(today);
-      }
+      const list: AttendanceRecord[] = Array.isArray(res.data)
+        ? res.data
+        : Array.isArray((res as any)?.records)
+        ? (res as any).records
+        : Array.isArray((res?.data as any)?.records)
+        ? (res.data as any).records
+        : [];
+
+      setHistory(list);
+
+      const todayStr = new Date().toISOString().split('T')[0];
+      const match = list.find((a: AttendanceRecord) => a.date === todayStr)
+        || (res as any)?.today
+        || (res?.data as any)?.today;
+      if (match) setTodayAttendance(match);
     } catch (e) {
       // offline fallback
     } finally {
@@ -135,13 +164,13 @@ export const AttendanceScreen: React.FC = () => {
           <div>
             <div className="text-[10px] text-slate-500 uppercase font-bold">Coordinates</div>
             <div className="font-mono font-bold text-slate-900 dark:text-white mt-0.5">
-              {currentLocation.lat.toFixed(4)}° N, {currentLocation.lng.toFixed(4)}° E
+              {(currentLocation?.lat ?? 28.6318).toFixed(4)}° N, {(currentLocation?.lng ?? 77.2170).toFixed(4)}° E
             </div>
           </div>
           <div className="text-right">
             <div className="text-[10px] text-slate-500 uppercase font-bold">Signal Accuracy</div>
             <div className="font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
-              ±{currentLocation.accuracy} meters
+              ±{currentLocation?.accuracy ?? 8} meters
             </div>
           </div>
         </div>
@@ -203,23 +232,21 @@ export const AttendanceScreen: React.FC = () => {
             <div className="p-2 rounded-xl bg-white dark:bg-[#091222] border border-blue-100 dark:border-slate-800">
               <div className="text-[10px] text-slate-400">Punch In</div>
               <div className="font-mono font-bold text-slate-800 dark:text-white mt-0.5">
-                {new Date(todayAttendance.check_in_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                {formatTimeSafe(todayAttendance.check_in_time)}
               </div>
             </div>
 
             <div className="p-2 rounded-xl bg-white dark:bg-[#091222] border border-blue-100 dark:border-slate-800">
               <div className="text-[10px] text-slate-400">Punch Out</div>
               <div className="font-mono font-bold text-slate-800 dark:text-white mt-0.5">
-                {todayAttendance.check_out_time 
-                  ? new Date(todayAttendance.check_out_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                  : '--:--'}
+                {todayAttendance.check_out_time ? formatTimeSafe(todayAttendance.check_out_time) : '--:--'}
               </div>
             </div>
 
             <div className="p-2 rounded-xl bg-white dark:bg-[#091222] border border-blue-100 dark:border-slate-800">
               <div className="text-[10px] text-slate-400">Status</div>
               <div className="font-mono font-bold text-emerald-500 uppercase mt-0.5">
-                {todayAttendance.status}
+                {todayAttendance.status || 'Active'}
               </div>
             </div>
           </div>
@@ -242,7 +269,7 @@ export const AttendanceScreen: React.FC = () => {
         </div>
 
         <div className="space-y-2">
-          {history.length === 0 ? (
+          {(!Array.isArray(history) || history.length === 0) ? (
             <div className="p-6 text-center text-xs text-slate-500 rounded-3xl bg-white dark:bg-[#091222] border border-slate-200 dark:border-slate-800">
               No historical punch records found.
             </div>
@@ -254,11 +281,11 @@ export const AttendanceScreen: React.FC = () => {
               >
                 <div>
                   <div className="font-bold text-slate-900 dark:text-white">
-                    {new Date(record.date).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
+                    {formatDateSafe(record.date)}
                   </div>
                   <div className="text-[10px] text-slate-400 font-mono mt-0.5">
-                    In: {new Date(record.check_in_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    {record.check_out_time && ` · Out: ${new Date(record.check_out_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+                    In: {formatTimeSafe(record.check_in_time)}
+                    {record.check_out_time && ` · Out: ${formatTimeSafe(record.check_out_time)}`}
                   </div>
                 </div>
 
@@ -271,7 +298,7 @@ export const AttendanceScreen: React.FC = () => {
                     {record.status}
                   </span>
                   <div className="text-[10px] text-slate-400 font-mono mt-0.5">
-                    {record.verification_method?.replace('_', ' ')}
+                    {record.verification_method?.replace('_', ' ') || 'GPS Geofence'}
                   </div>
                 </div>
               </div>

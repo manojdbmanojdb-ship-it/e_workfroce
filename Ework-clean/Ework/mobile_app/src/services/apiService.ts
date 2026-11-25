@@ -161,8 +161,23 @@ class ApiService {
   }
 
   // Attendance Endpoints
-  async getAttendance(): Promise<{ success: boolean; data?: AttendanceRecord[] }> {
-    return this.request('/employee/attendance');
+  async getAttendance(): Promise<{ success: boolean; data?: AttendanceRecord[]; records?: AttendanceRecord[]; stats?: any; today?: AttendanceRecord }> {
+    const res: any = await this.request('/employee/attendance');
+    if (res && res.data) {
+      if (Array.isArray(res.data)) {
+        return res;
+      }
+      if (Array.isArray(res.data.records)) {
+        return {
+          ...res,
+          records: res.data.records,
+          stats: res.data.stats,
+          today: res.data.today,
+          data: res.data.records
+        };
+      }
+    }
+    return res;
   }
 
   async checkIn(lat: number, lng: number, notes?: string): Promise<{ success: boolean; data?: AttendanceRecord; error?: string; message?: string }> {

@@ -390,10 +390,10 @@ export async function getEmployeeAttendance(req, res) {
 
     const records = db.prepare(`
       SELECT * FROM attendance 
-      WHERE user_id = ? OR user_name = ?
+      WHERE user_id = ? OR CAST(user_id AS TEXT) = ? OR user_name = ?
       ORDER BY date DESC, created_at DESC
       LIMIT 60
-    `).all(employee.user_id, employee.name);
+    `).all(employee.user_id, String(employee.id), employee.name);
 
     const todayStr = new Date().toISOString().split('T')[0];
     const today = records.find(r => r.date === todayStr);
@@ -408,18 +408,17 @@ export async function getEmployeeAttendance(req, res) {
 
     res.json({
       success: true,
-      data: {
-        records,
-        today,
-        stats: {
-          daysPresent: records.length,
-          lateCount,
-          totalWorkHours: (totalWorkMinutes / 60).toFixed(1),
-          leaveBalance: {
-            annual: employee.leave_balance_annual || 14,
-            sick: employee.leave_balance_sick || 8,
-            casual: employee.leave_balance_casual || 4
-          }
+      data: records, // Return array directly for straightforward frontend consumers
+      records,
+      today,
+      stats: {
+        daysPresent: records.length,
+        lateCount,
+        totalWorkHours: (totalWorkMinutes / 60).toFixed(1),
+        leaveBalance: {
+          annual: employee.leave_balance_annual || 14,
+          sick: employee.leave_balance_sick || 8,
+          casual: employee.leave_balance_casual || 4
         }
       }
     });
