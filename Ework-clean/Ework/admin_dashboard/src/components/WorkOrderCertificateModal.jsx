@@ -27,7 +27,7 @@ export default function WorkOrderCertificateModal({
     technicianRole: 'Senior Field Technician',
     beforePhoto: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&auto=format&fit=crop&q=80',
     beforeNotes: 'Burned out compressor capacitor and clogged intake filter before servicing.',
-    afterPhoto: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=800&auto=format&fit=crop&q=80',
+    afterPhoto: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&auto=format&fit=crop&q=80',
     afterNotes: 'Installed new 45uF capacitor, cleaned copper coils, pressure tested at 120 PSI.',
     checklist: [
       { item: 'Compressor & electrical supply voltage diagnostic', done: true, time: '09:20 AM' },
@@ -159,7 +159,15 @@ export default function WorkOrderCertificateModal({
               <div className="grid grid-cols-2 gap-4">
                 <div className="border border-slate-200 rounded-xl overflow-hidden bg-slate-100">
                   <div className="relative h-40">
-                    <img src={proof.beforePhoto} alt="Before" className="w-full h-full object-cover" />
+                    <img 
+                      src={proof.beforePhoto} 
+                      alt="Before" 
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&auto=format&fit=crop&q=80';
+                      }}
+                      className="w-full h-full object-cover" 
+                    />
                     <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/75 text-white text-[10px] font-bold">
                       BEFORE SERVICE
                     </span>
@@ -171,7 +179,15 @@ export default function WorkOrderCertificateModal({
 
                 <div className="border border-slate-200 rounded-xl overflow-hidden bg-slate-100">
                   <div className="relative h-40">
-                    <img src={proof.afterPhoto} alt="After" className="w-full h-full object-cover" />
+                    <img 
+                      src={proof.afterPhoto} 
+                      alt="After" 
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&auto=format&fit=crop&q=80';
+                      }}
+                      className="w-full h-full object-cover" 
+                    />
                     <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/75 text-white text-[10px] font-bold">
                       AFTER COMPLETION
                     </span>

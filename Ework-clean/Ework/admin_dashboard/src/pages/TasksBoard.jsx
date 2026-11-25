@@ -41,7 +41,7 @@ const SAMPLE_ENRICHMENTS = {
       siteAddress: 'Connaught Place, Block B, New Delhi',
       beforePhoto: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&auto=format&fit=crop&q=80',
       beforeNotes: 'Burned out compressor capacitor and clogged intake filter before servicing.',
-      afterPhoto: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=800&auto=format&fit=crop&q=80',
+      afterPhoto: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&auto=format&fit=crop&q=80',
       afterNotes: 'Installed new 45uF capacitor, cleaned copper coils, pressure tested at 120 PSI.',
       customerName: 'Vikram Malhotra',
       customerDesignation: 'Property & Facilities Manager',

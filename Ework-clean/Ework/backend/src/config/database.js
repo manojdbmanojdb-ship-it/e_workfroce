@@ -445,7 +445,7 @@ export function initDatabase() {
         due_date: new Date(now - 86400000).toISOString(),
         priority: 'medium',
         status: 'completed',
-        proof_photo_urls: JSON.stringify(['https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=800&auto=format&fit=crop&q=80']),
+        proof_photo_urls: JSON.stringify(['https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&auto=format&fit=crop&q=80']),
         customer_name: 'Rohan Sen',
         customer_phone: '+91 98105-66778',
         customer_rating: 5,

@@ -27,7 +27,7 @@ const PRESET_BEFORE_PHOTOS = [
 const PRESET_AFTER_PHOTOS = [
   {
     name: 'HVAC Restored',
-    url: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=800&auto=format&fit=crop&q=80',
+    url: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&auto=format&fit=crop&q=80',
     notes: 'Replaced 45uF capacitor, cleaned copper fins, pressure normalized at 120 PSI.'
   },
   {

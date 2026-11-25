@@ -37,7 +37,7 @@ export default function ProofInspectorModal({
     technicianRole: 'Senior Field Technician',
     beforePhoto: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&auto=format&fit=crop&q=80',
     beforeNotes: 'Burned out compressor capacitor and clogged intake filter before servicing.',
-    afterPhoto: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=800&auto=format&fit=crop&q=80',
+    afterPhoto: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&auto=format&fit=crop&q=80',
     afterNotes: 'Installed new 45uF capacitor, cleaned copper coils, pressure tested at 120 PSI.',
     checklist: [
       { item: 'Compressor & electrical supply voltage diagnostic', done: true, time: '09:20 AM' },
@@ -276,6 +276,10 @@ export default function ProofInspectorModal({
                     <img
                       src={proof.beforePhoto}
                       alt="Before Work"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&auto=format&fit=crop&q=80';
+                      }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-3.5">
@@ -290,6 +294,10 @@ export default function ProofInspectorModal({
                     <img
                       src={proof.afterPhoto}
                       alt="After Work"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&auto=format&fit=crop&q=80';
+                      }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-3.5">
@@ -323,6 +331,10 @@ export default function ProofInspectorModal({
                     <img
                       src={proof.beforePhoto}
                       alt="Before"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&auto=format&fit=crop&q=80';
+                      }}
                       className="w-full h-64 object-cover"
                     />
                     <div className="p-4 bg-slate-900/90 border-t border-slate-800">
@@ -349,6 +361,10 @@ export default function ProofInspectorModal({
                     <img
                       src={proof.afterPhoto}
                       alt="After"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&auto=format&fit=crop&q=80';
+                      }}
                       className="w-full h-64 object-cover"
                     />
                     <div className="p-4 bg-slate-900/90 border-t border-slate-800">
