@@ -32,55 +32,74 @@ export const LoginScreen: React.FC = () => {
 
     try {
       const res = await apiService.signIn(email, password);
-      if (res.success && res.data) {
-        login(res.data);
-      } else {
-        // Fallback for demo / offline match
-        const demo = QUICK_DEMO_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
-        if (demo) {
-          login({
-            id: `emp-${Date.now()}`,
-            name: demo.name,
-            email: demo.email,
-            role: demo.role,
-            avatar: demo.avatar,
-            employee_id: 'EW-4091',
-            designation: demo.role
-          });
-        } else {
-          setError(res.error || 'Invalid credentials. Please verify your work email and password.');
-        }
+      const userPayload = (res as any)?.user || res?.data;
+      if (res?.success && userPayload) {
+        login(userPayload);
+        return;
       }
-    } catch (err: any) {
-      // Local fallback on server unreachable during local test
+      
+      // Fallback for demo / offline match
       const demo = QUICK_DEMO_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
       if (demo) {
         login({
-          id: `emp-fallback`,
+          id: demo.name.includes('Rahul') ? 'usr-102' : demo.name.includes('Priya') ? 'usr-103' : 'usr-104',
           name: demo.name,
           email: demo.email,
           role: demo.role,
           avatar: demo.avatar,
-          employee_id: 'EW-4091',
+          employee_id: demo.name.includes('Rahul') ? 'EW-4091' : demo.name.includes('Priya') ? 'EW-4092' : 'EW-4093',
+          designation: demo.role
+        });
+        return;
+      }
+
+      setError((res as any)?.error || 'Invalid credentials. Please verify your work email and password.');
+    } catch (err: any) {
+      // Local fallback on server unreachable / Render free tier spinup
+      const demo = QUICK_DEMO_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (demo) {
+        login({
+          id: demo.name.includes('Rahul') ? 'usr-102' : demo.name.includes('Priya') ? 'usr-103' : 'usr-104',
+          name: demo.name,
+          email: demo.email,
+          role: demo.role,
+          avatar: demo.avatar,
+          employee_id: demo.name.includes('Rahul') ? 'EW-4091' : demo.name.includes('Priya') ? 'EW-4092' : 'EW-4093',
           designation: demo.role
         });
         showToast('Signed in via offline cached profile', 'info');
       } else {
-        setError('Cannot reach server. Check network connection or API URL in Settings.');
+        setError('Server waking up. Tap any 1-Tap Demo Staff button below to sign in instantly.');
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleQuickSelect = (demoEmail: string) => {
-    setEmail(demoEmail);
+  const handleQuickSelect = (demo: typeof QUICK_DEMO_USERS[0]) => {
+    setEmail(demo.email);
     setPassword('Workforce@2026');
     setError('');
+
+    const targetUser = {
+      id: demo.name.includes('Rahul') ? 'usr-102' : demo.name.includes('Priya') ? 'usr-103' : 'usr-104',
+      name: demo.name,
+      email: demo.email,
+      role: demo.role,
+      avatar: demo.avatar,
+      employee_id: demo.name.includes('Rahul') ? 'EW-4091' : demo.name.includes('Priya') ? 'EW-4092' : 'EW-4093',
+      designation: demo.role
+    };
+
+    // Instant 1-tap login to prevent any perceived UI freeze
+    login(targetUser);
+
+    // Asynchronously sync with backend if online
+    apiService.signIn(demo.email, 'Workforce@2026').catch(() => {});
   };
 
   return (
-    <div className="min-h-screen w-screen flex flex-col justify-between p-6 bg-slate-50 dark:bg-[#070c14] text-slate-900 dark:text-white select-none safe-top safe-bottom">
+    <div className="min-h-[100dvh] w-full flex flex-col justify-between p-6 bg-slate-50 dark:bg-[#070c14] text-slate-900 dark:text-white safe-top safe-bottom">
       
       {/* Header Branding */}
       <div className="pt-4 flex items-center justify-between">
@@ -187,27 +206,24 @@ export const LoginScreen: React.FC = () => {
             <Sparkles className="h-3.5 w-3.5 text-sky-400" />
             <span>1-Tap Demo Staff Logins</span>
           </div>
-          <div className="grid grid-cols-1 gap-2">
+          <div className="grid grid-cols-1 gap-2.5">
             {QUICK_DEMO_USERS.map((demo) => (
               <button
                 key={demo.email}
                 type="button"
-                onClick={() => handleQuickSelect(demo.email)}
-                className={`p-2.5 rounded-2xl border text-left flex items-center justify-between transition-all ${
-                  email === demo.email
-                    ? 'bg-blue-50 dark:bg-sky-950/40 border-blue-500 text-blue-700 dark:text-sky-300 font-bold'
-                    : 'bg-white dark:bg-[#0c1424] border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-400'
-                }`}
+                onClick={() => handleQuickSelect(demo)}
+                className="p-3 rounded-2xl border text-left flex items-center justify-between transition-all bg-white dark:bg-[#0c1424] border-slate-200 dark:border-slate-800 hover:border-blue-500 text-slate-700 dark:text-slate-300 active:scale-[0.98] cursor-pointer shadow-xs"
               >
-                <div className="flex items-center space-x-2.5">
-                  <span className="text-base">{demo.avatar}</span>
-                  <div>
-                    <div className="text-xs font-bold leading-tight">{demo.name}</div>
-                    <div className="text-[10px] text-slate-400 leading-tight">{demo.role}</div>
+                <div className="flex items-center space-x-2.5 min-w-0">
+                  <span className="text-xl flex-shrink-0">{demo.avatar}</span>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-slate-900 dark:text-white leading-tight truncate">{demo.name}</div>
+                    <div className="text-[10px] text-slate-400 leading-tight truncate">{demo.role} • {demo.badge}</div>
                   </div>
                 </div>
-                <span className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
-                  {demo.badge}
+                <span className="text-[10px] font-bold px-2.5 py-1 rounded-xl bg-blue-50 dark:bg-sky-950/60 text-blue-600 dark:text-sky-400 border border-blue-200 dark:border-sky-800 flex items-center space-x-1 flex-shrink-0">
+                  <span>Sign In</span>
+                  <ArrowRight className="h-3 w-3" />
                 </span>
               </button>
             ))}

@@ -134,18 +134,45 @@ export default function LoginPage({
     }
   };
 
-  const handleSelectPersona = (persona) => {
+  const handleSelectPersona = (persona, autoLogin = false) => {
     setEmail(persona.email);
     setPassword('Workforce@2026');
     setFullName(persona.name);
     setError('');
     setSuccessMsg('');
-    if (persona.role.includes('Manager')) {
+    const isMgr = persona.role.includes('Manager') || persona.role.includes('Super Admin');
+    const targetMode = isMgr ? 'manager' : 'employee';
+    if (isMgr) {
       setSelectedRole('manager');
       setPortalMode('manager');
     } else {
       setSelectedRole('field');
       setPortalMode('employee');
+    }
+
+    if (autoLogin) {
+      const targetUser = {
+        id: Date.now(),
+        user_id: `user-${persona.email.split('@')[0]}`,
+        name: persona.name,
+        email: persona.email,
+        role: persona.role,
+        badge: persona.badge,
+        avatar: persona.avatar,
+        sign_in: new Date().toISOString(),
+        sign_in_count: 1,
+        sign_in_status: 'online',
+        created_at: new Date().toISOString()
+      };
+      if (onLoginSuccess) {
+        onLoginSuccess(targetUser, targetMode);
+      }
+      // Sync in background to update DB sign_in column
+      fetch(`${getApiBaseUrl()}/api/auth/sign-in`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: persona.email, password: 'Workforce@2026' })
+      }).catch(() => {});
     }
   };
 
@@ -535,16 +562,19 @@ export default function LoginPage({
                     <button
                       key={p.email}
                       type="button"
-                      onClick={() => handleSelectPersona(p)}
-                      className="text-left p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/50 bg-slate-50 dark:bg-slate-900/60 hover:bg-blue-50/50 dark:hover:bg-blue-950/30 transition-all cursor-pointer"
+                      onClick={() => handleSelectPersona(p, true)}
+                      className="text-left p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/50 bg-slate-50 dark:bg-slate-900/60 hover:bg-blue-50/50 dark:hover:bg-blue-950/30 transition-all cursor-pointer flex items-center justify-between"
                     >
-                      <div className="flex items-center space-x-2">
-                        <span className="text-base">{p.avatar}</span>
+                      <div className="flex items-center space-x-2 min-w-0">
+                        <span className="text-base flex-shrink-0">{p.avatar}</span>
                         <div className="min-w-0 flex-1">
                           <div className="text-xs font-bold text-slate-900 dark:text-white truncate">{p.name}</div>
                           <div className="text-[10px] text-blue-600 dark:text-blue-400 truncate font-semibold">{p.role}</div>
                         </div>
                       </div>
+                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-blue-600/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 whitespace-nowrap ml-1 flex-shrink-0">
+                        1-Tap In →
+                      </span>
                     </button>
                   ))}
                 </div>

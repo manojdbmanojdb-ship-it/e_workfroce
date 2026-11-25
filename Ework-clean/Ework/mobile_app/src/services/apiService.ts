@@ -5,7 +5,7 @@ import type { Task, AttendanceRecord, LeaveRequest, LeaveBalances, NotificationI
 export const getDefaultApiBase = (): string => {
   if (typeof window !== 'undefined') {
     const custom = localStorage.getItem('ework_api_url');
-    if (custom) return custom;
+    if (custom) return custom.replace(/\/+$/, '');
   }
   
   // Environment variable (Vite production build / cloud deployment)
@@ -16,6 +16,11 @@ export const getDefaultApiBase = (): string => {
       trimmed = `https://${trimmed}`;
     }
     return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`;
+  }
+
+  // Automatic Render cloud detection: always route to backend web service
+  if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
+    return 'https://ework-backend.onrender.com/api';
   }
 
   if (Capacitor.getPlatform() === 'android') {
@@ -72,10 +77,22 @@ class ApiService {
     }
 
     try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 10000); // 10s timeout to prevent UI freezes on sleeping servers
+
       const res = await fetch(url, {
         ...options,
+        signal: controller.signal,
         headers
       });
+
+      clearTimeout(timer);
+
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        const text = await res.text();
+        throw new Error(`Server returned non-JSON response (${res.status})`);
+      }
 
       const data = await res.json();
       return data;
@@ -86,11 +103,15 @@ class ApiService {
   }
 
   // Auth Endpoints
-  async signIn(email: string, password: string): Promise<{ success: boolean; data?: any; error?: string }> {
-    return this.request('/auth/sign-in', {
+  async signIn(email: string, password: string): Promise<{ success: boolean; data?: any; user?: any; error?: string }> {
+    const res: any = await this.request('/auth/sign-in', {
       method: 'POST',
       body: JSON.stringify({ email, password, portalMode: 'employee' })
     });
+    if (res && res.user && !res.data) {
+      res.data = res.user;
+    }
+    return res;
   }
 
   async getProfile(): Promise<{ success: boolean; data?: User }> {

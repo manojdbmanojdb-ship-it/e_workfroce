@@ -31,6 +31,11 @@ export const getApiBaseUrl = () => {
   // Global override from window
   if (window.__EWORK_API_URL__) return window.__EWORK_API_URL__.replace(/\/+$/, '');
 
+  // If hosted on Render, route directly to the deployed backend
+  if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
+    return 'https://ework-backend.onrender.com';
+  }
+
   // In Android native environment:
   // If running in Android emulator, 10.0.2.2 routes to the host computer's localhost:5000
   if (isCapacitor()) {
