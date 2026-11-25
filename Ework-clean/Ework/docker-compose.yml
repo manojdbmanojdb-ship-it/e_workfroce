@@ -11,9 +11,11 @@ services:
       - "5000:5000"
     environment:
       - PORT=5000
+      - NODE_ENV=production
       - SUPABASE_URL=https://agggzpdbqvjiulqtzyrn.supabase.co
       - SUPABASE_ANON_KEY=sb_publishable__8-Vwbf0J08_JQ3cu6ekUw_qX9p5LlW
-      - NODE_ENV=production
+      - NEXT_PUBLIC_SUPABASE_URL=https://agggzpdbqvjiulqtzyrn.supabase.co
+      - NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable__8-Vwbf0J08_JQ3cu6ekUw_qX9p5LlW
     networks:
       - ework_network
 
@@ -27,6 +29,25 @@ services:
       - "80:80"
     depends_on:
       - backend
+    environment:
+      - VITE_SUPABASE_URL=https://agggzpdbqvjiulqtzyrn.supabase.co
+      - VITE_SUPABASE_ANON_KEY=sb_publishable__8-Vwbf0J08_JQ3cu6ekUw_qX9p5LlW
+    networks:
+      - ework_network
+
+  mobile_app:
+    build:
+      context: ./mobile_app
+      dockerfile: Dockerfile
+    container_name: ework_mobile
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    environment:
+      - VITE_SUPABASE_URL=https://agggzpdbqvjiulqtzyrn.supabase.co
+      - VITE_SUPABASE_ANON_KEY=sb_publishable__8-Vwbf0J08_JQ3cu6ekUw_qX9p5LlW
     networks:
       - ework_network
 

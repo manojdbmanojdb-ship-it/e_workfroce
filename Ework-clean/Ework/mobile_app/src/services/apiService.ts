@@ -8,10 +8,22 @@ export const getDefaultApiBase = (): string => {
     if (custom) return custom;
   }
   
+  // Environment variable (Vite production build / cloud deployment)
+  const envUrl = (import.meta as any).env?.VITE_API_URL;
+  if (envUrl) {
+    const trimmed = envUrl.replace(/\/+$/, '');
+    return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`;
+  }
+
   if (Capacitor.getPlatform() === 'android') {
     // 10.0.2.2 is Android emulator standard mapping for host machine localhost
     return 'http://10.0.2.2:5000/api';
   }
+
+  if (typeof window !== 'undefined' && (window.location.port === '' || window.location.port === '80' || window.location.port === '443')) {
+    return `${window.location.origin}/api`;
+  }
+
   return 'http://localhost:5000/api';
 };
 

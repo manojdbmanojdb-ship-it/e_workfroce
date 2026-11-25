@@ -15,6 +15,11 @@ export const isCapacitor = () => {
 export const getApiBaseUrl = () => {
   if (typeof window === 'undefined') return 'http://localhost:5000';
   
+  // Environment variable (Vite production build / cloud deployment)
+  if (import.meta.env?.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.replace(/\/+$/, '');
+  }
+
   // Custom user-configured backend endpoint (e.g. settings / QR scan)
   const customUrl = localStorage.getItem('ework_api_url');
   if (customUrl) return customUrl.replace(/\/+$/, '');
@@ -25,8 +30,12 @@ export const getApiBaseUrl = () => {
   // In Android native environment:
   // If running in Android emulator, 10.0.2.2 routes to the host computer's localhost:5000
   if (isCapacitor()) {
-    // Check if we are running in emulator or default
     return 'http://10.0.2.2:5000';
+  }
+
+  // If deployed behind Nginx reverse-proxy on port 80 or 443
+  if (window.location.port === '' || window.location.port === '80' || window.location.port === '443') {
+    return window.location.origin;
   }
 
   // Standard web browser

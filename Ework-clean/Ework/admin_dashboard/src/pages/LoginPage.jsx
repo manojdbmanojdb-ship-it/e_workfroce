@@ -6,6 +6,7 @@ import {
   Database, UserPlus, ChevronRight
 } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle.jsx';
+import { getApiBaseUrl } from '../utils/apiConfig.js';
 
 const DEMO_PERSONAS = [
   {
@@ -180,9 +181,10 @@ export default function LoginPage({
     };
 
     try {
+      const baseUrl = getApiBaseUrl();
       const endpoint = authMode === 'register'
-        ? 'http://localhost:5000/api/auth/sign-up'
-        : 'http://localhost:5000/api/auth/sign-in';
+        ? `${baseUrl}/api/auth/sign-up`
+        : `${baseUrl}/api/auth/sign-in`;
 
       const res = await fetch(endpoint, {
         method: 'POST',

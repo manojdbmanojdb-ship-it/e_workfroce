@@ -9,6 +9,7 @@ import {
   QrCode, Download
 } from 'lucide-react';
 import { io } from 'socket.io-client';
+import { getApiBaseUrl } from './utils/apiConfig.js';
 
 // Page components
 import TasksBoard from './pages/TasksBoard.jsx';
@@ -613,7 +614,7 @@ function LiveTrackingView({ onTriggerSos, sosAlerts, darkMode = false }) {
 
   // Connect to live WebSocket
   useEffect(() => {
-    const socket = io('http://localhost:5000');
+    const socket = io(getApiBaseUrl());
     setActiveSocket(socket);
 
     socket.on('connect', () => {
@@ -1481,7 +1482,7 @@ export default function App() {
 
   // Listen for real-time two-way synchronization broadcasts from backend & mobile app
   useEffect(() => {
-    const socket = io('http://localhost:5000');
+    const socket = io(getApiBaseUrl());
     
     socket.on('sos_alert', (alert) => {
       setSosAlerts(prev => [alert, ...prev]);
@@ -1554,7 +1555,7 @@ export default function App() {
     }
     try {
       soundService.playSosSiren();
-      const res = await fetch('http://localhost:5000/api/sos/trigger', {
+      const res = await fetch(`${getApiBaseUrl()}/api/sos/trigger`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
