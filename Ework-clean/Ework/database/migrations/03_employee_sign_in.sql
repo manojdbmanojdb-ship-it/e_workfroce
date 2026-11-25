@@ -1,7 +1,7 @@
 -- =========================================================================
 -- 10. EMPLOYEE SIGN-IN TABLE IN SUPABASE
 -- Run this query in the Supabase SQL Editor:
--- https://supabase.com/dashboard/project/ptxfxtxwytrzznswudlc/sql/new
+-- https://supabase.com/dashboard/project/agggzpdbqvjiulqtzyrn/sql/new
 --
 -- This creates the table in your Supabase Database (shown in your screenshot)
 -- to store employee details and the exact "sign_in" timestamp when they click Sign In.

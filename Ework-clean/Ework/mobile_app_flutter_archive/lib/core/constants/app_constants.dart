@@ -1,7 +1,7 @@
 class AppConstants {
   // Supabase Configuration
-  static const String supabaseUrl = 'https://ptxfxtxwytrzznswudlc.supabase.co';
-  static const String supabaseAnonKey = 'sb_publishable_G3ztWl6ullU0Zn0NJgJn9Q_AAKDtdFQ';
+  static const String supabaseUrl = 'https://agggzpdbqvjiulqtzyrn.supabase.co';
+  static const String supabaseAnonKey = 'sb_publishable__8-Vwbf0J08_JQ3cu6ekUw_qX9p5LlW';
 
   // Backend API
   static const String apiBaseUrl = 'http://localhost:5000/api';

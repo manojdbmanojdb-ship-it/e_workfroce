@@ -7,8 +7,8 @@ import {
 import { soundService } from '../utils/soundService.js';
 
 const API_BASE = 'http://localhost:5000/api';
-const SUPABASE_PROJECT_URL = 'https://supabase.com/dashboard/project/ptxfxtxwytrzznswudlc/database/tables';
-const SUPABASE_SQL_EDITOR_URL = 'https://supabase.com/dashboard/project/ptxfxtxwytrzznswudlc/sql/new';
+const SUPABASE_PROJECT_URL = 'https://supabase.com/dashboard/project/agggzpdbqvjiulqtzyrn/database/tables';
+const SUPABASE_SQL_EDITOR_URL = 'https://supabase.com/dashboard/project/agggzpdbqvjiulqtzyrn/sql/new';
 
 const SQL_CREATE_TABLE = `-- 10. EMPLOYEE SIGN-IN TABLE IN SUPABASE
 CREATE TABLE IF NOT EXISTS public.employee_sign_ins (
@@ -251,7 +251,7 @@ export default function DatabaseUserInspectorModal({ isOpen, onClose, currentUse
                   <div className="flex items-center space-x-2">
                     <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                     <span className="text-xs font-black uppercase tracking-wider text-emerald-400">
-                      Supabase Cloud Project: E-Workforce (ptxfxtxwytrzznswudlc)
+                      Supabase Cloud Project: E-Workforce (agggzpdbqvjiulqtzyrn)
                     </span>
                   </div>
                   <p className="text-xs text-slate-300 mt-1">
@@ -652,7 +652,7 @@ export default function DatabaseUserInspectorModal({ isOpen, onClose, currentUse
         <div className="p-4 border-t border-slate-800 bg-slate-900/60 flex items-center justify-between flex-shrink-0">
           <div className="text-xs text-slate-400 flex items-center space-x-2">
             <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-            <span>Project: <strong className="text-white font-mono">E-Workforce (ptxfxtxwytrzznswudlc)</strong></span>
+            <span>Project: <strong className="text-white font-mono">E-Workforce (agggzpdbqvjiulqtzyrn)</strong></span>
           </div>
           <button
             onClick={onClose}

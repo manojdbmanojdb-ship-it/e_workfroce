@@ -131,9 +131,11 @@ export default function AttendancePage({ darkMode = false }) {
 
   const fetchSites = async () => {
     try {
-      const res = await fetch('https://ptxfxtxwytrzznswudlc.supabase.co/rest/v1/work_sites?select=*', {
+      const supabaseUrl = import.meta.env?.VITE_SUPABASE_URL || 'https://agggzpdbqvjiulqtzyrn.supabase.co';
+      const supabaseKey = import.meta.env?.VITE_SUPABASE_ANON_KEY || 'sb_publishable__8-Vwbf0J08_JQ3cu6ekUw_qX9p5LlW';
+      const res = await fetch(`${supabaseUrl}/rest/v1/work_sites?select=*`, {
         headers: {
-          'apikey': 'sb_publishable_G3ztWl6ullU0Zn0NJgJn9Q_AAKDtdFQ'
+          'apikey': supabaseKey
         }
       });
       const data = await res.json();

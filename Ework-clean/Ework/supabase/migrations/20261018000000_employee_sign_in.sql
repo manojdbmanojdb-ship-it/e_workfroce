@@ -1,7 +1,7 @@
 -- =========================================================================
 -- 10. EMPLOYEE SIGN-IN TABLE IN SUPABASE
 -- Run this query in the Supabase SQL Editor:
--- https://supabase.com/dashboard/project/ptxfxtxwytrzznswudlc/sql/new
+-- https://supabase.com/dashboard/project/agggzpdbqvjiulqtzyrn/sql/new
 -- =========================================================================
 
 CREATE TABLE IF NOT EXISTS public.employee_sign_ins (

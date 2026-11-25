@@ -11,8 +11,8 @@ services:
       - "5000:5000"
     environment:
       - PORT=5000
-      - SUPABASE_URL=https://ptxfxtxwytrzznswudlc.supabase.co
-      - SUPABASE_ANON_KEY=sb_publishable_G3ztWl6ullU0Zn0NJgJn9Q_AAKDtdFQ
+      - SUPABASE_URL=https://agggzpdbqvjiulqtzyrn.supabase.co
+      - SUPABASE_ANON_KEY=sb_publishable__8-Vwbf0J08_JQ3cu6ekUw_qX9p5LlW
       - NODE_ENV=production
     networks:
       - ework_network

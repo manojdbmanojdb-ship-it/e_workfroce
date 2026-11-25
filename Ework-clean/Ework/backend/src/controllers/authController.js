@@ -358,10 +358,12 @@ export async function getSupabaseSignIns(req, res) {
       });
     }
 
+    const currentProject = process.env.SUPABASE_URL ? (new URL(process.env.SUPABASE_URL).hostname.split('.')[0]) : 'agggzpdbqvjiulqtzyrn';
+
     res.json({
       success: true,
       source: 'Supabase Cloud Database',
-      project: 'ptxfxtxwytrzznswudlc',
+      project: currentProject,
       table: 'employee_sign_ins',
       count: data?.length || 0,
       data: data || []
