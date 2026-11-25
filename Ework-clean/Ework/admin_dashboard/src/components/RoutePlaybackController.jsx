@@ -20,8 +20,8 @@ export default function RoutePlaybackController({
   const [playbackSpeed, setPlaybackSpeed] = useState(1); // 1x, 2x, 5x
   const [showStopsList, setShowStopsList] = useState(false);
 
-  const routeData = ROUTE_HISTORY_DATA[selectedEmployeeId] || ROUTE_HISTORY_DATA['emp-3'];
-  const points = routeData.points;
+  const routeData = ROUTE_HISTORY_DATA[selectedEmployeeId] || ROUTE_HISTORY_DATA['emp-1'] || Object.values(ROUTE_HISTORY_DATA)[0];
+  const points = routeData ? routeData.points : [];
   const currentPoint = points[currentIndex] || points[0];
 
   // Playback timer tick

@@ -147,8 +147,8 @@ export default function InteractiveMap({
   const [selectedSite, setSelectedSite] = useState(INITIAL_WORK_SITES[0]);
 
   // Playback route resolution
-  const routeData = ROUTE_HISTORY_DATA[playbackEmployeeId] || ROUTE_HISTORY_DATA['emp-3'];
-  const routePoints = routeData.points;
+  const routeData = ROUTE_HISTORY_DATA[playbackEmployeeId] || ROUTE_HISTORY_DATA['emp-1'] || Object.values(ROUTE_HISTORY_DATA)[0];
+  const routePoints = routeData ? routeData.points : [];
   const currentPlaybackPoint = routePoints[playbackIndex] || routePoints[0];
 
   const traveledPath = routePoints.slice(0, playbackIndex + 1).map(p => [p.lat, p.lng]);

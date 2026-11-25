@@ -1,6 +1,68 @@
 // Rich historical turn-by-turn route data with timestamps, speeds, and waypoints for Delhi NCR
 
 export const ROUTE_HISTORY_DATA = {
+  'emp-1': {
+    employeeId: 'emp-1',
+    name: 'Rahul Sharma',
+    role: 'HVAC Technician',
+    vehicle: 'Service Van #1 (DL-10-CV-8821)',
+    date: '2026-10-17',
+    totalDistanceKm: 18.2,
+    avgSpeedKmh: 24.6,
+    maxSpeedKmh: 45.0,
+    idleDurationMin: 68,
+    stopsCount: 3,
+    stops: [
+      { id: 'stop-1', name: 'Delhi Corporate HQ', time: '09:00 AM', lat: 28.6315, lng: 77.2167, duration: '15 min', type: 'depot', notes: 'Tool kit & parts check-out' },
+      { id: 'stop-2', name: 'Palika Bazaar Chiller Plant', time: '09:25 AM', lat: 28.6318, lng: 77.2170, duration: '45 min', type: 'service', notes: 'Compressor maintenance #T-402' },
+      { id: 'stop-3', name: 'Barakhamba Central Substation', time: '10:30 AM', lat: 28.6322, lng: 77.2178, duration: '35 min', type: 'service', notes: 'Refrigerant pressure calibration' },
+    ],
+    points: [
+      { lat: 28.6315, lng: 77.2167, speed: 0, time: '09:00 AM', street: 'Delhi Corporate HQ Depot', stopId: 'stop-1' },
+      { lat: 28.6316, lng: 77.2168, speed: 15, time: '09:08 AM', street: 'Inner Circle Road' },
+      { lat: 28.6318, lng: 77.2170, speed: 0, time: '09:25 AM', street: 'Palika Underground Vault', stopId: 'stop-2' },
+      { lat: 28.6318, lng: 77.2170, speed: 0, time: '10:05 AM', street: 'Palika Vault Exit Gate' },
+      { lat: 28.6319, lng: 77.2172, speed: 18, time: '10:12 AM', street: 'Radial Road 2' },
+      { lat: 28.6320, lng: 77.2174, speed: 24, time: '10:18 AM', street: 'Radial Road 3' },
+      { lat: 28.6322, lng: 77.2178, speed: 0, time: '10:30 AM', street: 'Barakhamba Substation #2', stopId: 'stop-3' },
+      { lat: 28.6322, lng: 77.2178, speed: 0, time: '11:05 AM', street: 'Substation Service Bay' },
+      { lat: 28.6325, lng: 77.2185, speed: 26, time: '11:15 AM', street: 'Tolstoy Road' },
+      { lat: 28.6328, lng: 77.2192, speed: 32, time: '11:22 AM', street: 'Janpath Crossing' },
+      { lat: 28.6331, lng: 77.2198, speed: 38, time: '11:30 AM', street: 'Shivaji Stadium Terminal' },
+      { lat: 28.6318, lng: 77.2170, speed: 10, time: '11:45 AM', street: 'CP Service Return' }
+    ]
+  },
+  'emp-2': {
+    employeeId: 'emp-2',
+    name: 'Priya Patel',
+    role: 'Sales Executive',
+    vehicle: 'Honda City Hybrid (DL-3C-PQ-1022)',
+    date: '2026-10-17',
+    totalDistanceKm: 22.4,
+    avgSpeedKmh: 28.5,
+    maxSpeedKmh: 52.0,
+    idleDurationMin: 45,
+    stopsCount: 3,
+    stops: [
+      { id: 'stop-1', name: 'Aerocity Worldmark Hub', time: '09:15 AM', lat: 28.5510, lng: 77.1220, duration: '35 min', type: 'meeting', notes: 'Key Accounts Pitch #C-118' },
+      { id: 'stop-2', name: 'Chanakyapuri Embassy Lane', time: '10:40 AM', lat: 28.5950, lng: 77.1850, duration: '30 min', type: 'meeting', notes: 'Contract Renewal Signing' },
+      { id: 'stop-3', name: 'Connaught Place Regal Plaza', time: '11:50 AM', lat: 28.6312, lng: 77.2163, duration: '25 min', type: 'meeting', notes: 'Regional Sales Briefing' },
+    ],
+    points: [
+      { lat: 28.5510, lng: 77.1220, speed: 0, time: '09:15 AM', street: 'Worldmark 1 Corporate Concierge', stopId: 'stop-1' },
+      { lat: 28.5510, lng: 77.1220, speed: 0, time: '09:45 AM', street: 'Aerocity Departure Gate' },
+      { lat: 28.5580, lng: 77.1350, speed: 45, time: '09:55 AM', street: 'NH-48 Airport Expressway' },
+      { lat: 28.5720, lng: 77.1550, speed: 52, time: '10:08 AM', street: 'Dhaula Kuan Underpass' },
+      { lat: 28.5830, lng: 77.1700, speed: 38, time: '10:20 AM', street: 'Shanti Path Avenue' },
+      { lat: 28.5950, lng: 77.1850, speed: 0, time: '10:40 AM', street: 'Chanakyapuri Corporate Wing', stopId: 'stop-2' },
+      { lat: 28.5950, lng: 77.1850, speed: 0, time: '11:10 AM', street: 'Embassy Lane Exit' },
+      { lat: 28.6080, lng: 77.1980, speed: 36, time: '11:22 AM', street: 'Teen Murti Marg' },
+      { lat: 28.6180, lng: 77.2080, speed: 32, time: '11:35 AM', street: 'Sansad Marg (Parliament St)' },
+      { lat: 28.6270, lng: 77.2140, speed: 25, time: '11:44 AM', street: 'Janpath Radial' },
+      { lat: 28.6312, lng: 77.2163, speed: 0, time: '11:50 AM', street: 'Regal Plaza Client Office', stopId: 'stop-3' },
+      { lat: 28.6312, lng: 77.2163, speed: 0, time: '12:15 PM', street: 'Connaught Place Meeting End' }
+    ]
+  },
   'emp-3': {
     employeeId: 'emp-3',
     name: 'Amit Verma',
@@ -18,7 +80,7 @@ export const ROUTE_HISTORY_DATA = {
       { id: 'stop-3', name: 'Indian Oil Station #402', time: '10:05 AM', lat: 28.6329, lng: 77.2195, duration: '12 min', type: 'fuel', notes: 'Refueled 17.85 L (Claim #EXP-4011)' },
       { id: 'stop-4', name: 'DND Flyway Expressway Plaza', time: '10:45 AM', lat: 28.5815, lng: 77.2934, duration: '15 min', type: 'transit', notes: 'FASTag toll passage & cargo handover' },
     ],
-    // 24 sequential GPS breadcrumb waypoints along the route
+    // 19 sequential GPS breadcrumb waypoints along the route
     points: [
       { lat: 28.6315, lng: 77.2167, speed: 0, time: '08:30 AM', street: 'Depot Yard Gate 1', stopId: 'stop-1' },
       { lat: 28.6318, lng: 77.2172, speed: 18, time: '08:33 AM', street: 'Kasturba Gandhi Marg' },
@@ -41,28 +103,67 @@ export const ROUTE_HISTORY_DATA = {
       { lat: 28.5815, lng: 77.2934, speed: 0, time: '11:00 AM', street: 'Cargo Verification' }
     ]
   },
-  'emp-1': {
-    employeeId: 'emp-1',
-    name: 'Rahul Sharma',
-    role: 'HVAC Technician',
-    vehicle: 'Service Van #1 (DL-10-CV-8821)',
+  'emp-4': {
+    employeeId: 'emp-4',
+    name: 'Sneha Rao',
+    role: 'Site Inspector',
+    vehicle: 'Hyundai Venue (DL-8C-AA-9011)',
     date: '2026-10-17',
-    totalDistanceKm: 18.2,
-    avgSpeedKmh: 24.6,
-    maxSpeedKmh: 45.0,
-    idleDurationMin: 68,
+    totalDistanceKm: 16.5,
+    avgSpeedKmh: 22.0,
+    maxSpeedKmh: 42.0,
+    idleDurationMin: 60,
     stopsCount: 3,
     stops: [
-      { id: 'stop-1', name: 'Delhi Corporate HQ', time: '09:00 AM', lat: 28.6315, lng: 77.2167, duration: '15 min', type: 'depot', notes: 'Tool kit & parts check-out' },
-      { id: 'stop-2', name: 'Palika Bazaar Chiller Plant', time: '09:25 AM', lat: 28.6318, lng: 77.2170, duration: '45 min', type: 'service', notes: 'Compressor maintenance #T-402' },
-      { id: 'stop-3', name: 'Barakhamba Central Substation', time: '10:30 AM', lat: 28.6322, lng: 77.2178, duration: '35 min', type: 'service', notes: 'Refrigerant pressure calibration' },
+      { id: 'stop-1', name: 'Barakhamba Metro Site', time: '08:45 AM', lat: 28.6305, lng: 77.2155, duration: '40 min', type: 'inspection', notes: 'Safety Audit #A-552' },
+      { id: 'stop-2', name: 'Mandi House Junction', time: '10:10 AM', lat: 28.6258, lng: 77.2345, duration: '35 min', type: 'inspection', notes: 'Fire Equipment & Scaffolding Check' },
+      { id: 'stop-3', name: 'ITO Vikas Minar Tower', time: '11:30 AM', lat: 28.6200, lng: 77.2450, duration: '30 min', type: 'inspection', notes: 'Structural Hazard Report Sign-off' },
     ],
     points: [
-      { lat: 28.6315, lng: 77.2167, speed: 0, time: '09:00 AM', street: 'Delhi Corporate HQ Depot', stopId: 'stop-1' },
-      { lat: 28.6316, lng: 77.2168, speed: 15, time: '09:08 AM', street: 'Inner Circle' },
-      { lat: 28.6318, lng: 77.2170, speed: 0, time: '09:25 AM', street: 'Palika Underground Vault', stopId: 'stop-2' },
-      { lat: 28.6320, lng: 77.2174, speed: 24, time: '10:15 AM', street: 'Radial Road 3' },
-      { lat: 28.6322, lng: 77.2178, speed: 0, time: '10:30 AM', street: 'Barakhamba Substation #2', stopId: 'stop-3' },
+      { lat: 28.6305, lng: 77.2155, speed: 0, time: '08:45 AM', street: 'Barakhamba Road Base', stopId: 'stop-1' },
+      { lat: 28.6305, lng: 77.2155, speed: 0, time: '09:25 AM', street: 'Site Perimeter Check' },
+      { lat: 28.6310, lng: 77.2180, speed: 18, time: '09:35 AM', street: 'KG Marg Connector' },
+      { lat: 28.6290, lng: 77.2230, speed: 26, time: '09:48 AM', street: 'Feroze Shah Road' },
+      { lat: 28.6275, lng: 77.2290, speed: 30, time: '09:58 AM', street: 'Copernicus Marg' },
+      { lat: 28.6258, lng: 77.2345, speed: 0, time: '10:10 AM', street: 'Mandi House Circle South', stopId: 'stop-2' },
+      { lat: 28.6258, lng: 77.2345, speed: 0, time: '10:45 AM', street: 'Auditorium Exit Gate' },
+      { lat: 28.6240, lng: 77.2380, speed: 24, time: '10:55 AM', street: 'Sikandra Road' },
+      { lat: 28.6220, lng: 77.2420, speed: 32, time: '11:10 AM', street: 'Bahadur Shah Zafar Marg' },
+      { lat: 28.6200, lng: 77.2450, speed: 0, time: '11:30 AM', street: 'Vikas Minar Complex', stopId: 'stop-3' },
+      { lat: 28.6200, lng: 77.2450, speed: 0, time: '12:00 PM', street: 'ITO Municipal Inspection Finished' }
+    ]
+  },
+  'emp-5': {
+    employeeId: 'emp-5',
+    name: 'Vikram Singh',
+    role: 'HVAC Field Engineer',
+    vehicle: 'Tata Ace EV (DL-1L-EE-3312)',
+    date: '2026-10-17',
+    totalDistanceKm: 27.8,
+    avgSpeedKmh: 31.0,
+    maxSpeedKmh: 56.0,
+    idleDurationMin: 55,
+    stopsCount: 4,
+    stops: [
+      { id: 'stop-1', name: 'Okhla Component Warehouse', time: '08:15 AM', lat: 28.5355, lng: 77.2730, duration: '25 min', type: 'depot', notes: 'Loaded heavy compressors and coils' },
+      { id: 'stop-2', name: 'Nehru Place Server Facility', time: '09:40 AM', lat: 28.5494, lng: 77.2528, duration: '45 min', type: 'service', notes: 'Emergency Chiller Fix #H-209' },
+      { id: 'stop-3', name: 'Lajpat Nagar Central Plant', time: '11:00 AM', lat: 28.5700, lng: 77.2400, duration: '30 min', type: 'service', notes: 'Cooling tower sensor calibration' },
+      { id: 'stop-4', name: 'CP Super Speciality Clinic', time: '12:15 PM', lat: 28.6320, lng: 77.2180, duration: '40 min', type: 'service', notes: 'Air handling unit filter replacement' },
+    ],
+    points: [
+      { lat: 28.5355, lng: 77.2730, speed: 0, time: '08:15 AM', street: 'Okhla Phase III Heavy Yard', stopId: 'stop-1' },
+      { lat: 28.5355, lng: 77.2730, speed: 0, time: '08:40 AM', street: 'Okhla Industrial Exit' },
+      { lat: 28.5410, lng: 77.2650, speed: 34, time: '08:55 AM', street: 'Maa Anandmayee Marg' },
+      { lat: 28.5450, lng: 77.2580, speed: 28, time: '09:15 AM', street: 'Kalkaji Outer Ring' },
+      { lat: 28.5494, lng: 77.2528, speed: 0, time: '09:40 AM', street: 'Nehru Place IT Hub Chiller Yard', stopId: 'stop-2' },
+      { lat: 28.5494, lng: 77.2528, speed: 0, time: '10:25 AM', street: 'Nehru Place Gate 3' },
+      { lat: 28.5580, lng: 77.2480, speed: 38, time: '10:35 AM', street: 'Lala Lajpat Rai Road' },
+      { lat: 28.5700, lng: 77.2400, speed: 0, time: '11:00 AM', street: 'Lajpat Nagar Ring Road Substation', stopId: 'stop-3' },
+      { lat: 28.5700, lng: 77.2400, speed: 0, time: '11:30 AM', street: 'Lajpat Nagar North Flyover' },
+      { lat: 28.5850, lng: 77.2320, speed: 46, time: '11:42 AM', street: 'Jawaharlal Nehru Stadium Corridor' },
+      { lat: 28.6050, lng: 77.2250, speed: 42, time: '11:55 AM', street: 'Lodhi Road Arterial' },
+      { lat: 28.6200, lng: 77.2200, speed: 35, time: '12:05 PM', street: 'Janpath Extension' },
+      { lat: 28.6320, lng: 77.2180, speed: 0, time: '12:15 PM', street: 'CP Super Speciality Clinic HVAC Bay', stopId: 'stop-4' }
     ]
   }
 };

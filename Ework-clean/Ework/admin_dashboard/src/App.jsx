@@ -67,6 +67,7 @@ const INITIAL_STAFF = [
   { id: 'emp-2', name: 'Priya Patel', role: 'Sales Executive', status: 'At Site', location: 'Connaught Place, Delhi', battery: 64, speed: 0, lat: 28.6312, lng: 77.2163, routeTrail: [[28.6308, 77.2160], [28.6312, 77.2163]], task: 'Client Presentation #C-118', source: 'hardware' },
   { id: 'emp-3', name: 'Amit Verma', role: 'Delivery Agent', status: 'In Transit', location: 'Inner Circle Road', battery: 95, speed: 32, lat: 28.6335, lng: 77.2195, routeTrail: [[28.6320, 77.2180], [28.6328, 77.2188], [28.6335, 77.2195]], task: 'Express Dropoff #D-891', source: 'simulated' },
   { id: 'emp-4', name: 'Sneha Rao', role: 'Site Inspector', status: 'Completed', location: 'Barakhamba Road', battery: 42, speed: 0, lat: 28.6305, lng: 77.2155, routeTrail: [[28.6300, 77.2150], [28.6305, 77.2155]], task: 'Safety Audit #A-552', source: 'simulated' },
+  { id: 'emp-5', name: 'Vikram Singh', role: 'HVAC Engineer', status: 'In Transit', location: 'Okhla Industrial Area', battery: 76, speed: 28, lat: 28.5355, lng: 77.2730, routeTrail: [[28.5320, 77.2700], [28.5340, 77.2715], [28.5355, 77.2730]], task: 'Emergency Chiller Fix #H-209', source: 'simulated' },
 ];
 
 const NAV_ITEMS = [
@@ -1134,7 +1135,7 @@ function LiveTrackingView({ onTriggerSos, sosAlerts, darkMode = false }) {
                         </span>
                         <button
                           onClick={() => {
-                            setPlaybackEmployeeId(staff.id === 'emp-1' ? 'emp-1' : 'emp-3');
+                            setPlaybackEmployeeId(staff.id);
                             setPlaybackIndex(0);
                             setPlaybackMode(true);
                             setIsPlaying(true);
