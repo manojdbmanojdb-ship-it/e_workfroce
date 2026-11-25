@@ -6,13 +6,33 @@ import supabase from '../config/supabase.js';
  */
 function resolveEmployee(req) {
   if (req.user) return req.user;
-  const identifier = req.headers['x-user-id'] || req.query.userId || req.body.userId;
+
+  const identifier = req.headers['x-user-id'] || req.query.userId || req.body?.userId;
+  const email = req.headers['x-user-email'] || req.query.email || req.body?.email;
+
+  // 1. Match by user_id, integer primary key id, email, or name
   if (identifier) {
-    return db.prepare('SELECT * FROM users WHERE user_id = ? OR LOWER(email) = ? OR name = ?')
-      .get(identifier, identifier.toLowerCase(), identifier);
+    const match = db.prepare(`
+      SELECT * FROM users 
+      WHERE user_id = ? 
+         OR CAST(id AS TEXT) = ? 
+         OR LOWER(email) = ? 
+         OR LOWER(name) = ?
+    `).get(String(identifier), String(identifier), String(identifier).toLowerCase(), String(identifier).toLowerCase());
+    if (match) return match;
   }
-  // Default to Rahul Sharma if in demo fallback mode
-  return db.prepare('SELECT * FROM users WHERE user_id = "usr-102"').get();
+
+  // 2. Match by email
+  if (email) {
+    const match = db.prepare('SELECT * FROM users WHERE LOWER(email) = ?')
+      .get(String(email).toLowerCase());
+    if (match) return match;
+  }
+
+  // 3. Graceful fallback: Default to Rahul Sharma (usr-102) or first employee
+  return db.prepare('SELECT * FROM users WHERE user_id = "usr-102" OR LOWER(email) = "rahul@ework.com"').get()
+    || db.prepare('SELECT * FROM users WHERE role NOT LIKE "%Manager%" AND role NOT LIKE "%Admin%" ORDER BY id ASC LIMIT 1').get()
+    || db.prepare('SELECT * FROM users ORDER BY id ASC LIMIT 1').get();
 }
 
 /**

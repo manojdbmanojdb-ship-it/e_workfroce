@@ -59,9 +59,10 @@ export function authenticateUser(req, res, next) {
   if (!userId && !userEmail) {
     // Check Authorization header fallback
     const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer usr-')) {
+    if (authHeader && authHeader.startsWith('Bearer ')) {
       const extractedId = authHeader.replace('Bearer ', '').trim();
-      const user = db.prepare('SELECT * FROM users WHERE user_id = ?').get(extractedId);
+      const user = db.prepare('SELECT * FROM users WHERE user_id = ? OR CAST(id AS TEXT) = ? OR LOWER(email) = ?')
+        .get(extractedId, String(extractedId), extractedId.toLowerCase());
       if (user) {
         req.user = user;
         return next();
@@ -70,7 +71,8 @@ export function authenticateUser(req, res, next) {
   }
 
   if (userId) {
-    const user = db.prepare('SELECT * FROM users WHERE user_id = ?').get(userId);
+    const user = db.prepare('SELECT * FROM users WHERE user_id = ? OR CAST(id AS TEXT) = ? OR LOWER(email) = ? OR LOWER(name) = ?')
+      .get(String(userId), String(userId), String(userId).toLowerCase(), String(userId).toLowerCase());
     if (user) {
       req.user = user;
       return next();
@@ -78,7 +80,7 @@ export function authenticateUser(req, res, next) {
   }
 
   if (userEmail) {
-    const user = db.prepare('SELECT * FROM users WHERE LOWER(email) = ?').get(userEmail.toLowerCase());
+    const user = db.prepare('SELECT * FROM users WHERE LOWER(email) = ?').get(String(userEmail).toLowerCase());
     if (user) {
       req.user = user;
       return next();

@@ -67,10 +67,14 @@ class ApiService {
     if (savedUser) {
       try {
         const u = JSON.parse(savedUser);
-        if (u.id || u.user_id) {
-          headers['x-user-id'] = u.id || u.user_id;
-          headers['x-user-role'] = u.role || 'Field Staff';
+        const resolvedId = u.user_id || u.id || (u.email?.includes('rahul') ? 'usr-102' : 'usr-102');
+        if (resolvedId) {
+          headers['x-user-id'] = String(resolvedId);
         }
+        if (u.email) {
+          headers['x-user-email'] = u.email;
+        }
+        headers['x-user-role'] = u.role || 'Field Staff';
       } catch (e) {
         // ignore JSON parse
       }
@@ -162,16 +166,38 @@ class ApiService {
   }
 
   async checkIn(lat: number, lng: number, notes?: string): Promise<{ success: boolean; data?: AttendanceRecord; error?: string; message?: string }> {
+    let userId = 'usr-102';
+    let email = 'rahul@ework.com';
+    try {
+      const saved = localStorage.getItem('ework_user');
+      if (saved) {
+        const u = JSON.parse(saved);
+        userId = u.user_id || u.id || userId;
+        email = u.email || email;
+      }
+    } catch {}
+
     return this.request('/employee/attendance/check-in', {
       method: 'POST',
-      body: JSON.stringify({ lat, lng, notes })
+      body: JSON.stringify({ userId, email, lat, lng, notes })
     });
   }
 
   async checkOut(lat: number, lng: number, notes?: string): Promise<{ success: boolean; data?: AttendanceRecord; error?: string; message?: string }> {
+    let userId = 'usr-102';
+    let email = 'rahul@ework.com';
+    try {
+      const saved = localStorage.getItem('ework_user');
+      if (saved) {
+        const u = JSON.parse(saved);
+        userId = u.user_id || u.id || userId;
+        email = u.email || email;
+      }
+    } catch {}
+
     return this.request('/employee/attendance/check-out', {
       method: 'POST',
-      body: JSON.stringify({ lat, lng, notes })
+      body: JSON.stringify({ userId, email, lat, lng, notes })
     });
   }
 

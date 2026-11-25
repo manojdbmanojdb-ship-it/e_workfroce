@@ -8,8 +8,13 @@ export async function checkIn(req, res) {
     const { userId, siteId, lat, lng, method } = req.body;
     if (!userId) return res.status(400).json({ error: 'userId is required' });
 
-    const employee = db.prepare('SELECT * FROM users WHERE user_id = ? OR name = ? OR LOWER(email) = ?')
-      .get(userId, userId, userId.toLowerCase());
+    const employee = db.prepare(`
+      SELECT * FROM users 
+      WHERE user_id = ? 
+         OR CAST(id AS TEXT) = ? 
+         OR LOWER(email) = ? 
+         OR LOWER(name) = ?
+    `).get(String(userId), String(userId), String(userId).toLowerCase(), String(userId).toLowerCase());
 
     const finalUserId = employee ? employee.user_id : userId;
     const finalUserName = employee ? employee.name : userId;

@@ -41,8 +41,10 @@ export const LoginScreen: React.FC = () => {
       // Fallback for demo / offline match
       const demo = QUICK_DEMO_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
       if (demo) {
+        const uid = demo.name.includes('Rahul') ? 'usr-102' : demo.name.includes('Priya') ? 'usr-103' : 'usr-104';
         login({
-          id: demo.name.includes('Rahul') ? 'usr-102' : demo.name.includes('Priya') ? 'usr-103' : 'usr-104',
+          id: uid,
+          user_id: uid,
           name: demo.name,
           email: demo.email,
           role: demo.role,
@@ -58,8 +60,10 @@ export const LoginScreen: React.FC = () => {
       // Local fallback on server unreachable / Render free tier spinup
       const demo = QUICK_DEMO_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
       if (demo) {
+        const uid = demo.name.includes('Rahul') ? 'usr-102' : demo.name.includes('Priya') ? 'usr-103' : 'usr-104';
         login({
-          id: demo.name.includes('Rahul') ? 'usr-102' : demo.name.includes('Priya') ? 'usr-103' : 'usr-104',
+          id: uid,
+          user_id: uid,
           name: demo.name,
           email: demo.email,
           role: demo.role,
@@ -81,8 +85,10 @@ export const LoginScreen: React.FC = () => {
     setPassword('Workforce@2026');
     setError('');
 
+    const uid = demo.name.includes('Rahul') ? 'usr-102' : demo.name.includes('Priya') ? 'usr-103' : 'usr-104';
     const targetUser = {
-      id: demo.name.includes('Rahul') ? 'usr-102' : demo.name.includes('Priya') ? 'usr-103' : 'usr-104',
+      id: uid,
+      user_id: uid,
       name: demo.name,
       email: demo.email,
       role: demo.role,
