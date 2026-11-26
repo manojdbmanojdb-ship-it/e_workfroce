@@ -4,8 +4,9 @@ import {
   ShieldCheck, Lock, Save, RefreshCw, CheckCircle2,
   AlertTriangle, Briefcase, Award
 } from 'lucide-react';
+import { getApiBaseUrl } from '../utils/apiConfig.js';
 
-const API_BASE = 'http://localhost:5000/api/employee';
+const API_BASE = `${getApiBaseUrl()}/api/employee`;
 
 const AVATAR_OPTIONS = ['🔧', '👤', '👷', '💼', '⚡', '🛠️', '📋', '👔'];
 

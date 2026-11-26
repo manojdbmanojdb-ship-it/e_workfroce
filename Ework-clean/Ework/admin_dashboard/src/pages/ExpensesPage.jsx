@@ -7,8 +7,9 @@ import {
 import ReceiptInspectorModal from '../components/ReceiptInspectorModal.jsx';
 import PayoutVoucherModal from '../components/PayoutVoucherModal.jsx';
 import { soundService } from '../utils/soundService.js';
+import { getApiBaseUrl } from '../utils/apiConfig.js';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = `${getApiBaseUrl()}/api`;
 
 const CAT_ICONS = { 
   fuel: '⛽', 

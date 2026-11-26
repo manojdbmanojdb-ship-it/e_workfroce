@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import WorkforceBarChart from '../components/WorkforceBarChart';
 import OperationsLineChart from '../components/OperationsLineChart';
+import { getApiBaseUrl } from '../utils/apiConfig.js';
 
 const PERFORMANCE_DATA = [
   { name: 'Rahul Sharma', role: 'Technician', tasksCompleted: 42, onTime: 95, avgRating: 4.8, overtime: '14h', efficiency: 'high', distanceKm: 284 },
@@ -78,7 +79,7 @@ export default function ReportsPage({ darkMode = false }) {
   const handleTriggerDigest = async () => {
     try {
       setSendingDigest(true);
-      const res = await fetch('http://localhost:5000/api/notifications/daily-digest', {
+      const res = await fetch(`${getApiBaseUrl()}/api/notifications/daily-digest`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

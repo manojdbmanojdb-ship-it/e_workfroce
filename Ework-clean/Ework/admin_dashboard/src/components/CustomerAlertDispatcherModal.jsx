@@ -5,8 +5,9 @@ import {
 } from 'lucide-react';
 import { soundService } from '../utils/soundService.js';
 import CustomerTrackingPortalModal from './CustomerTrackingPortalModal';
+import { getApiBaseUrl } from '../utils/apiConfig.js';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = `${getApiBaseUrl()}/api`;
 
 const TEMPLATES = [
   {

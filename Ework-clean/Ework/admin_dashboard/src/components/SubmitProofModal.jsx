@@ -5,6 +5,7 @@ import {
   Layers, Wrench, AlertCircle, RefreshCw
 } from 'lucide-react';
 import { soundService } from '../utils/soundService.js';
+import { getApiBaseUrl } from '../utils/apiConfig.js';
 
 const PRESET_BEFORE_PHOTOS = [
   {
@@ -250,7 +251,7 @@ export default function SubmitProofModal({ isOpen, onClose, task, onSubmitSucces
       };
 
       try {
-        await fetch(`http://localhost:5000/api/tasks/${task.id}/proof`, {
+        await fetch(`${getApiBaseUrl()}/api/tasks/${task.id}/proof`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)

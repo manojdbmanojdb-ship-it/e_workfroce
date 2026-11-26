@@ -1,6 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, AlertTriangle, RefreshCw } from 'lucide-react';
 import { io } from 'socket.io-client';
+import { getApiBaseUrl } from '../utils/apiConfig.js';
+
+const API_BASE = `${getApiBaseUrl()}/api`;
+const SOCKET_BASE = getApiBaseUrl();
 
 const CONTACTS = [
   { id: 'emp-1', name: 'Rahul Sharma', role: 'Technician', status: 'online', task: 'HVAC Maintenance #T-402' },
@@ -29,7 +33,7 @@ export default function ChatPage({ darkMode = false }) {
 
   const fetchChatHistory = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/chat/messages');
+      const res = await fetch(`${API_BASE}/chat/messages`);
       const data = await res.json();
       if (data.success && Array.isArray(data.data) && data.data.length > 0) {
         const loaded = data.data.map(m => ({
@@ -50,7 +54,7 @@ export default function ChatPage({ darkMode = false }) {
   useEffect(() => {
     fetchChatHistory();
 
-    const s = io('http://localhost:5000');
+    const s = io(SOCKET_BASE);
     setSocket(s);
 
     s.on('connect', () => {
@@ -99,7 +103,7 @@ export default function ChatPage({ darkMode = false }) {
     }
 
     try {
-      await fetch('http://localhost:5000/api/chat/messages', {
+      await fetch(`${API_BASE}/chat/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

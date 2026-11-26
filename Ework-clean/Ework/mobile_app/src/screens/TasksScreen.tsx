@@ -7,9 +7,60 @@ import {
   AlertCircle, ChevronRight, CheckCircle2, RefreshCw 
 } from 'lucide-react';
 
+const DEFAULT_MOBILE_TASKS: Task[] = [
+  {
+    id: 'task-402',
+    title: 'HVAC Compressor Inspection #T-402',
+    description: 'Diagnose intermittent compressor shutdown and low coolant pressure on central chiller',
+    priority: 'urgent',
+    status: 'pending',
+    assigned_to: 'Rahul Sharma',
+    due: 'Today, 02:00 PM',
+    address: 'Connaught Place, Block B, New Delhi',
+    lat: 28.6318,
+    lng: 77.2170,
+    contact_name: 'Vikram Malhotra',
+    contact_phone: '+91 98112-40912'
+  },
+  {
+    id: 'task-415',
+    title: 'Quarterly Rooftop Chiller Unit Preventive Maintenance #T-415',
+    description: 'Scheduled multi-point maintenance: inspect coolant level, clean air intake filters, test condenser fans',
+    priority: 'medium',
+    status: 'in_progress',
+    assigned_to: 'Rahul Sharma',
+    due: 'Tomorrow, 11:30 AM',
+    address: 'DLF Cyber City, Tower C, Gurugram',
+    lat: 28.4986,
+    lng: 77.0878,
+    contact_name: 'Suresh Raina',
+    contact_phone: '+91 98201-44332'
+  },
+  {
+    id: 'task-395',
+    title: 'Fiber Switchboard Terminal Overhaul #T-395',
+    description: 'Replace worn junction box connectors and rewire 24 fiber optic patch lines.',
+    priority: 'medium',
+    status: 'completed',
+    assigned_to: 'Rahul Sharma',
+    due: 'Yesterday',
+    address: 'Nehru Place Tech Hub, South Delhi',
+    lat: 28.5492,
+    lng: 77.2533,
+    contact_name: 'Rohan Sen',
+    contact_phone: '+91 98105-66778',
+    proof: {
+      photos: ['https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&auto=format&fit=crop&q=80'],
+      customerName: 'Rohan Sen',
+      customerRating: 5,
+      notes: 'All patch cables rerouted and heat-shrink tagged with QR IDs.'
+    }
+  }
+];
+
 export const TasksScreen: React.FC = () => {
   const { navigateTo } = useApp();
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Task[]>(DEFAULT_MOBILE_TASKS);
   const [loading, setLoading] = useState(false);
   const [filterTab, setFilterTab] = useState<'all' | 'pending' | 'in_progress' | 'completed'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -18,11 +69,13 @@ export const TasksScreen: React.FC = () => {
     setLoading(true);
     try {
       const res = await apiService.getTasks();
-      if (res.success && res.data) {
+      if (res.success && res.data && res.data.length > 0) {
         setTasks(res.data);
+      } else {
+        setTasks(prev => prev.length > 0 ? prev : DEFAULT_MOBILE_TASKS);
       }
     } catch (e) {
-      // offline fallback
+      setTasks(prev => prev.length > 0 ? prev : DEFAULT_MOBILE_TASKS);
     } finally {
       setLoading(false);
     }

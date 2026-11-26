@@ -9,6 +9,7 @@ import ThemeToggle from '../components/ThemeToggle.jsx';
 import UniversalMobileHeader from '../components/UniversalMobileHeader.jsx';
 import UniversalMobileBottomNav from '../components/UniversalMobileBottomNav.jsx';
 import UniversalMobileDrawer from '../components/UniversalMobileDrawer.jsx';
+import { getApiBaseUrl } from '../utils/apiConfig.js';
 
 const NAV_TABS = [
   { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, route: '/employee/dashboard' },
@@ -65,7 +66,7 @@ export default function EmployeeLayout({
   const fetchUnreadCount = async () => {
     if (!currentUser) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/employee/dashboard-summary?userId=${currentUser.user_id || currentUser.id}`);
+      const res = await fetch(`${getApiBaseUrl()}/api/employee/dashboard-summary?userId=${currentUser.user_id || currentUser.id}`);
       const data = await res.json();
       if (data.success && data.data?.unreadNotificationsCount !== undefined) {
         setUnreadNotifsCount(data.data.unreadNotificationsCount);
@@ -79,7 +80,7 @@ export default function EmployeeLayout({
 
   // Real-time socket updates for Employee Portal
   useEffect(() => {
-    const socket = io('http://localhost:5000');
+    const socket = io(getApiBaseUrl());
 
     socket.on('task_created', (task) => {
       if (task.assigned_to === currentUser?.name || task.assigned_to_id === currentUser?.user_id) {

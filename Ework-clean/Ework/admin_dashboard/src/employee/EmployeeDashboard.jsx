@@ -4,8 +4,9 @@ import {
   TrendingUp, Calendar as CalendarIcon, MapPin, Award, User,
   Bell, ArrowRight, ShieldCheck, CheckSquare, Sparkles, RefreshCw
 } from 'lucide-react';
+import { getApiBaseUrl } from '../utils/apiConfig.js';
 
-const API_BASE = 'http://localhost:5000/api/employee';
+const API_BASE = `${getApiBaseUrl()}/api/employee`;
 
 export default function EmployeeDashboard({ currentUser, onNavigate }) {
   const [loading, setLoading] = useState(true);

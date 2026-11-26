@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, CheckCircle2, Shield, Copy, Check, Users, MapPin, Layers, Sparkles } from 'lucide-react';
 import { isPointInPolygon, formatArea } from '../utils/geofenceUtils.js';
 import { soundService } from '../utils/soundService.js';
+import { getApiBaseUrl } from '../utils/apiConfig.js';
 
 const CATEGORIES = [
   'Commercial SEZ & Tech Park',
@@ -89,7 +90,7 @@ export default function SavePolygonModal({
 
       // Also persist to backend API
       try {
-        await fetch('http://localhost:5000/api/geofences/polygons', {
+        await fetch(`${getApiBaseUrl()}/api/geofences/polygons`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(polygonData)

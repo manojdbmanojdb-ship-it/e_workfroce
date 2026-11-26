@@ -3,8 +3,9 @@ import {
   Bell, CheckCircle2, Clock, AlertTriangle, ShieldCheck,
   Megaphone, X, Filter, Check, RefreshCw
 } from 'lucide-react';
+import { getApiBaseUrl } from '../utils/apiConfig.js';
 
-const API_BASE = 'http://localhost:5000/api/employee';
+const API_BASE = `${getApiBaseUrl()}/api/employee`;
 
 const TYPE_CONFIG = {
   task_assigned: { icon: '📋', badge: 'New Task', color: 'bg-sky-500/15 text-sky-600 dark:text-sky-400 border-sky-500/30' },

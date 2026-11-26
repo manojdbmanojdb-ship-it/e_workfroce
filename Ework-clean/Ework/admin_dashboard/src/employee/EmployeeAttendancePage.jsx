@@ -3,8 +3,9 @@ import {
   Clock, MapPin, CheckCircle2, AlertTriangle, Play, Pause,
   Calendar, FileText, Download, ShieldCheck, RefreshCw, X, Plus
 } from 'lucide-react';
+import { getApiBaseUrl } from '../utils/apiConfig.js';
 
-const API_BASE = 'http://localhost:5000/api/employee';
+const API_BASE = `${getApiBaseUrl()}/api/employee`;
 
 export default function EmployeeAttendancePage({ currentUser }) {
   const [data, setData] = useState(null);

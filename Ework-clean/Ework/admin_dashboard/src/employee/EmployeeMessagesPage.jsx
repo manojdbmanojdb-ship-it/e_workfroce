@@ -4,8 +4,10 @@ import {
   RefreshCw, CheckCheck, Megaphone, Hash
 } from 'lucide-react';
 import { io } from 'socket.io-client';
+import { getApiBaseUrl } from '../utils/apiConfig.js';
 
-const API_BASE = 'http://localhost:5000/api/employee';
+const API_BASE = `${getApiBaseUrl()}/api/employee`;
+const SOCKET_BASE = getApiBaseUrl();
 
 export default function EmployeeMessagesPage({ currentUser }) {
   const [messages, setMessages] = useState([]);
@@ -35,7 +37,7 @@ export default function EmployeeMessagesPage({ currentUser }) {
     fetchMessages();
 
     // Listen for live socket messages
-    const socket = io('http://localhost:5000');
+    const socket = io(SOCKET_BASE);
     socket.on('new_message', (msg) => {
       setMessages(prev => [...prev.filter(m => m.id !== msg.id), msg]);
     });

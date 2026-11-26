@@ -5,6 +5,7 @@ import {
   ChevronUp, ChevronDown, Check, Copy, Share2, MapPin, RefreshCw,
   Sliders, User, CheckSquare, Square, Eye, Compass
 } from 'lucide-react';
+import { getApiBaseUrl } from '../utils/apiConfig.js';
 
 const CENTRAL_DEPOT = {
   id: 'depot-0',
@@ -208,7 +209,7 @@ export default function RouteOptimizerModal({ isOpen, onClose, employeeName = 'R
   const handleDispatch = async () => {
     try {
       setDispatching(true);
-      const res = await fetch('http://localhost:5000/api/routes/dispatch', {
+      const res = await fetch(`${getApiBaseUrl()}/api/routes/dispatch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
