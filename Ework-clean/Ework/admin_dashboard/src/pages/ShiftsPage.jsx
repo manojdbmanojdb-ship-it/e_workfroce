@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
 import {
   Calendar as CalendarIcon, MapPin, Clock, Plus, X,
   AlertTriangle, CheckCircle2, ChevronLeft, ChevronRight,
   User, ShieldCheck, Sparkles, Filter, Trash2, Send
 } from 'lucide-react';
 import { soundService } from '../utils/soundService.js';
+import { getApiBaseUrl } from '../utils/apiConfig.js';
 
 const EMPLOYEES = [
   { name: 'Rahul Sharma', role: 'Senior Technician', avatar: '🔧' },
@@ -57,12 +59,69 @@ const STATUS_STYLE = {
   cancelled: 'bg-slate-700/50 text-slate-400 border-slate-600',
 };
 
+const STORAGE_KEY = 'ework_shifts_roster_v2';
+
 export default function ShiftsPage({ darkMode = false }) {
-  const [shifts, setShifts] = useState(INITIAL_SHIFTS);
+  const [shifts, setShifts] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length >= 0) return parsed;
+      }
+    } catch (_) {}
+    return INITIAL_SHIFTS;
+  });
   const [viewMode, setViewMode] = useState('calendar'); // 'calendar' | 'cards'
   const [filterType, setFilterType] = useState('all'); // 'all' | 'conflicts' | 'scheduled'
   const [showAddModal, setShowAddModal] = useState(false);
   const [successToast, setSuccessToast] = useState(null);
+
+  // Sync with backend SQLite API & Socket.IO
+  useEffect(() => {
+    const apiBase = `${getApiBaseUrl()}/api`;
+    const socketBase = getApiBaseUrl();
+
+    // 1. Fetch shifts from backend API
+    const fetchShifts = async () => {
+      try {
+        const res = await fetch(`${apiBase}/shifts`);
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          // If localStorage is already populated by user deletions/additions, keep user edits
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (!saved) {
+            setShifts(json.data);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(json.data));
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load shifts from backend:', err);
+      }
+    };
+    fetchShifts();
+
+    // 2. Real-time multi-device sync
+    const socket = io(socketBase);
+    socket.on('shift_created', (newShift) => {
+      setShifts(prev => {
+        if (prev.some(s => String(s.id) === String(newShift.id))) return prev;
+        const updated = [newShift, ...prev];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        return updated;
+      });
+    });
+
+    socket.on('shift_deleted', ({ id }) => {
+      setShifts(prev => {
+        const updated = prev.filter(s => String(s.id) !== String(id));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        return updated;
+      });
+    });
+
+    return () => socket.disconnect();
+  }, []);
 
   // Form state
   const [employee, setEmployee] = useState(EMPLOYEES[0].name);
@@ -99,13 +158,13 @@ export default function ShiftsPage({ darkMode = false }) {
     return true;
   });
 
-  const handleCreateShift = (e) => {
+  const handleCreateShift = async (e) => {
     e.preventDefault();
     const empObj = EMPLOYEES.find(e => e.name === employee);
     const dayObj = DAYS_OF_WEEK.find(d => d.date === shiftDate) || { day: 'Sat' };
 
     const newShift = {
-      id: Date.now(),
+      id: `shift-${Date.now()}`,
       employee,
       role: empObj?.role || 'Technician',
       site,
@@ -120,6 +179,7 @@ export default function ShiftsPage({ darkMode = false }) {
     const newConflicts = detectConflicts(newShiftsList);
 
     setShifts(newShiftsList);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newShiftsList));
     setShowAddModal(false);
 
     if (newConflicts[newShift.id]) {
@@ -131,10 +191,35 @@ export default function ShiftsPage({ darkMode = false }) {
     }
 
     setTimeout(() => setSuccessToast(null), 3500);
+
+    // Persist to backend
+    try {
+      await fetch(`${getApiBaseUrl()}/api/shifts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newShift)
+      });
+    } catch (err) {
+      console.error('Failed to sync created shift with backend:', err);
+    }
   };
 
-  const handleDeleteShift = (id) => {
-    setShifts(prev => prev.filter(s => s.id !== id));
+  const handleDeleteShift = async (id) => {
+    const updated = shifts.filter(s => String(s.id) !== String(id));
+    setShifts(updated);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    soundService.playSuccessChime();
+    setSuccessToast('✓ Shift removed from roster!');
+    setTimeout(() => setSuccessToast(null), 3000);
+
+    // Persist deletion to backend
+    try {
+      await fetch(`${getApiBaseUrl()}/api/shifts/${id}`, {
+        method: 'DELETE'
+      });
+    } catch (err) {
+      console.error('Failed to delete shift on backend:', err);
+    }
   };
 
   const handlePublishRoster = () => {

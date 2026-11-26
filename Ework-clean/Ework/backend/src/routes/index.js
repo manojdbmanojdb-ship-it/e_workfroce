@@ -5,7 +5,7 @@ import { triggerSOS, resolveSOS, getSOSAlerts } from '../controllers/sosControll
 import { submitExpense, reviewExpense, getExpenses } from '../controllers/expenseController.js';
 import { getAssets, getAssetByCode, assignAsset, createAsset } from '../controllers/assetController.js';
 import { sendMessage, getMessages } from '../controllers/chatController.js';
-import { getShifts, createShift } from '../controllers/shiftController.js';
+import { getShifts, createShift, deleteShift } from '../controllers/shiftController.js';
 import { optimizeCustomRoute, getDailyRoutePreview, dispatchRoute } from '../controllers/routeController.js';
 import { triggerDailyDigest, getNotifications, triggerSosTest, triggerCustomerDispatchAlert } from '../controllers/notificationController.js';
 import { getGeofencePolygons, createGeofencePolygon, verifyPointInPolygon } from '../controllers/geofenceController.js';
@@ -124,6 +124,7 @@ router.get('/chat/messages', getMessages);
 // Shifts
 router.get('/shifts', getShifts);
 router.post('/shifts', createShift);
+router.delete('/shifts/:id', deleteShift);
 
 // Route Optimization & Fuel Calculator
 router.post('/routes/optimize', optimizeCustomRoute);

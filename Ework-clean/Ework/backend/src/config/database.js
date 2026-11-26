@@ -269,6 +269,48 @@ export function initDatabase() {
     );
   `);
 
+  // 8. Shifts & Roster Table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS shifts (
+      id TEXT PRIMARY KEY,
+      employee TEXT NOT NULL,
+      role TEXT,
+      site TEXT NOT NULL,
+      date TEXT NOT NULL,
+      day TEXT,
+      start TEXT NOT NULL,
+      end TEXT NOT NULL,
+      status TEXT DEFAULT 'scheduled',
+      notes TEXT,
+      created_at TEXT NOT NULL
+    );
+  `);
+
+  // Seed default shifts if table is empty
+  const shiftCountRow = db.prepare('SELECT COUNT(*) as count FROM shifts').get();
+  if (shiftCountRow.count === 0) {
+    console.log('[Database] Seeding initial shifts into ework.db...');
+    const insertShiftStmt = db.prepare(`
+      INSERT INTO shifts (id, employee, role, site, date, day, start, end, status, notes, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    const initialShifts = [
+      { id: '1', employee: 'Rahul Sharma', role: 'Senior Technician', site: 'Delhi Corporate HQ', date: '2026-10-12', day: 'Mon', start: '09:00', end: '18:00', status: 'completed' },
+      { id: '2', employee: 'Priya Patel', role: 'Sales Executive', site: 'Mumbai Tech Hub', date: '2026-10-12', day: 'Mon', start: '10:00', end: '19:00', status: 'completed' },
+      { id: '3', employee: 'Amit Verma', role: 'Delivery Agent', site: 'Bengaluru Depot', date: '2026-10-13', day: 'Tue', start: '08:00', end: '17:00', status: 'completed' },
+      { id: '4', employee: 'Sneha Rao', role: 'Site Inspector', site: 'Hyderabad Site', date: '2026-10-14', day: 'Wed', start: '09:00', end: '18:00', status: 'completed' },
+      { id: '5', employee: 'Rahul Sharma', role: 'Senior Technician', site: 'Delhi Corporate HQ', date: '2026-10-15', day: 'Thu', start: '09:00', end: '18:00', status: 'scheduled' },
+      { id: '6', employee: 'Rahul Sharma', role: 'Senior Technician', site: 'Connaught Place Site #B', date: '2026-10-15', day: 'Thu', start: '13:00', end: '20:00', status: 'scheduled' },
+      { id: '7', employee: 'Vikram Singh', role: 'Field Engineer', site: 'Pune Depot', date: '2026-10-16', day: 'Fri', start: '07:00', end: '16:00', status: 'scheduled' },
+      { id: '8', employee: 'Priya Patel', role: 'Sales Executive', site: 'Mumbai Tech Hub', date: '2026-10-16', day: 'Fri', start: '10:00', end: '19:00', status: 'scheduled' },
+      { id: '9', employee: 'Deepa Nair', role: 'Technician', site: 'Delhi Corporate HQ', date: '2026-10-17', day: 'Sat', start: '09:00', end: '18:00', status: 'scheduled' },
+      { id: '10', employee: 'Amit Verma', role: 'Delivery Agent', site: 'Bengaluru Depot', date: '2026-10-17', day: 'Sat', start: '08:00', end: '17:00', status: 'scheduled' }
+    ];
+    for (const s of initialShifts) {
+      insertShiftStmt.run(s.id, s.employee, s.role, s.site, s.date, s.day, s.start, s.end, s.status, s.notes || '', new Date().toISOString());
+    }
+  }
+
   // -------------------------------------------------------------
   // Seed Default Users if needed
   // -------------------------------------------------------------
