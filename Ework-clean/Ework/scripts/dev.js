@@ -10,9 +10,10 @@ const isWin = process.platform === 'win32';
 const npmCmd = isWin ? 'npm.cmd' : 'npm';
 
 console.log('====================================================');
-console.log('🚀 Starting Ework Workspace in VS Code...');
+console.log('🚀 Starting ALL Ework Services (Backend, Admin & Mobile)...');
 console.log('   - Backend API & SQLite:  http://localhost:5000');
 console.log('   - Admin Web Dashboard:   http://localhost:5173');
+console.log('   - Mobile Web App:        http://localhost:5174');
 console.log('====================================================\n');
 
 function runService(name, cwd, command, args, colorCode) {
@@ -61,15 +62,24 @@ const dashboardProc = runService(
   'Dashboard',
   path.join(rootDir, 'admin_dashboard'),
   npmCmd,
-  ['run', 'dev'],
+  ['run', 'dev', '--', '--port', '5173', '--host'],
   '32' // Green
 );
 
+const mobileProc = runService(
+  'MobileApp',
+  path.join(rootDir, 'mobile_app'),
+  npmCmd,
+  ['run', 'dev', '--', '--port', '5174', '--host'],
+  '35' // Magenta
+);
+
 function shutdown() {
-  console.log('\n🛑 Shutting down Ework services...');
+  console.log('\n🛑 Shutting down all Ework services...');
   try {
     if (backendProc && !backendProc.killed) backendProc.kill('SIGINT');
     if (dashboardProc && !dashboardProc.killed) dashboardProc.kill('SIGINT');
+    if (mobileProc && !mobileProc.killed) mobileProc.kill('SIGINT');
   } catch (_) {}
   setTimeout(() => process.exit(0), 500);
 }
